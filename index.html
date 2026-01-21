@@ -1,271 +1,50 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anwesenheitsplaner JF Ehingen</title>
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/491/491410.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
-        body {
-            font-family: sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-        }
-        
-        .controls {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        
-        .config-section {
-            background: #eee;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-            border: 1px solid #ccc;
-        }
-        
-        h2 {
-            color: #e10000;
-            margin: 0 0 10px 0;
-            width: 100%;
-        }
-        
-        .tab-container {
-            display: flex;
-            gap: 5px;
-            margin-bottom: -1px;
-        }
-        
-        .tab {
-            padding: 10px 20px;
-            background: #ddd;
-            border: 1px solid #ccc;
-            border-bottom: none;
-            border-radius: 8px 8px 0 0;
-            cursor: pointer;
-            font-weight: bold;
-            color: #555;
-        }
-        
-        .tab.active {
-            background: white;
-            color: #e10000;
-            border-bottom: 2px solid white;
-            z-index: 2;
-        }
-        
-        .table-container {
-            background: white;
-            padding: 10px;
-            border-radius: 0 8px 8px 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            overflow-x: auto;
-            border-top: 1px solid #ccc;
-        }
-        
-        table {
-            border-collapse: collapse;
-            min-width: 100%;
-        }
-        
-        th,
-        td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
-        }
-        
-        th {
-            background: #333;
-            color: white;
-            font-size: 12px;
-            vertical-align: top;
-        }
-        /* Checkbox-Spalte */
-        
-        th.special-col {
-            background: #0056b3;
-            min-width: 100px;
-            max-width: 140px;
-            word-wrap: break-word;
-            hyphens: auto;
-        }
-        /* Statistik-Spalten Styling */
-        
-        .stat-col {
-            background: #e9ecef;
-            font-weight: bold;
-            min-width: 40px;
-        }
-        
-        th.stat-header {
-            background: #555;
-        }
-        
-        .special-title-input {
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 11px;
-            text-align: center;
-            width: 100%;
-            resize: none;
-            font-family: inherit;
-            overflow: hidden;
-            height: auto;
-            display: block;
-            margin: 0 auto 5px auto;
-            hyphens: auto;
-            line-height: 1.3;
-            padding: 0;
-        }
-        
-        .header-input {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            text-align: center;
-            font-size: 12px;
-            padding: 4px;
-            width: 90px;
-        }
-        
-        td:first-child {
-            text-align: left;
-            font-weight: bold;
-            position: sticky;
-            left: 0;
-            background: white;
-            z-index: 10;
-            min-width: 180px;
-            border-right: 2px solid #ccc;
-            white-space: nowrap;
-        }
-        
-        th:first-child {
-            position: sticky;
-            left: 0;
-            background: #222;
-            z-index: 11;
-            border-right: 2px solid #ccc;
-        }
-        
-        .sum-row {
-            background: #eee;
-            font-weight: bold;
-        }
-        
-        .sum-row td:first-child {
-            background: #eee;
-        }
-        
-        .status-A {
-            background-color: #d4edda !important;
-        }
-        
-        .status-E {
-            background-color: #fff3cd !important;
-        }
-        
-        .status-U {
-            background-color: #f8d7da !important;
-        }
-        
-        input[type="text"],
-        textarea {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        
-        button {
-            padding: 10px 15px;
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            color: white;
-        }
-        
-        .btn-green {
-            background: #28a745;
-        }
-        
-        .btn-blue {
-            background: #007bff;
-        }
-        
-        .btn-yellow {
-            background: #ffc107;
-            color: black;
-        }
-        
-        .btn-red {
-            background: #dc3545;
-        }
-        
-        .btn-gray {
-            background: #6c757d;
-        }
-        
-        .btn-orange {
-            background: #fd7e14;
-        }
-        
-        button:hover {
-            opacity: 0.8;
-        }
-        
-        select {
-            border: none;
-            background: transparent;
-            width: 100%;
-            cursor: pointer;
-            font-weight: bold;
-            text-align-last: center;
-        }
-        
-        .delete-btn {
-            color: #ccc;
-            cursor: pointer;
-            margin-left: 8px;
-            font-size: 10px;
-            transition: 0.2s;
-        }
-        
-        .delete-btn:hover {
-            color: #ff4444;
-            transform: scale(1.2);
-        }
-        
-        .date-delete {
-            display: inline-block;
-            color: #ff6666;
-            margin-top: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        
-        .date-delete:hover {
-            color: #ff0000;
-        }
-        
-        input[type="checkbox"] {
-            transform: scale(1.3);
-            cursor: pointer;
-        }
+        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
+        .controls { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .config-section { background: #eee; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
+        h2 { color: #e10000; margin: 0 0 10px 0; width: 100%; }
+        .tab-container { display: flex; gap: 5px; margin-bottom: -1px; }
+        .tab { padding: 10px 20px; background: #ddd; border: 1px solid #ccc; border-bottom: none; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; color: #555; transition: 0.2s; }
+        .tab.active { background: white; color: #e10000; border-bottom: 2px solid white; z-index: 2; }
+        .table-container { background: white; padding: 10px; border-radius: 0 8px 8px 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); overflow-x: auto; border-top: 1px solid #ccc; }
+        table { border-collapse: collapse; min-width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background: #333; color: white; font-size: 12px; vertical-align: top; }
+        th.special-col { background: #0056b3; min-width: 100px; max-width: 140px; word-wrap: break-word; hyphens: auto; }
+        .stat-col { background: #f8f9fa; font-weight: bold; min-width: 40px; }
+        .special-title-input { background: transparent; border: none; color: white; font-size: 11px; text-align: center; width: 100%; resize: none; font-family: inherit; overflow: hidden; height: auto; display: block; margin: 0 auto 5px auto; line-height: 1.3; }
+        .header-input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; text-align: center; font-size: 12px; padding: 4px; width: 90px; }
+        td:first-child { text-align: left; font-weight: bold; position: sticky; left: 0; background: white; z-index: 10; min-width: 180px; border-right: 2px solid #ccc; white-space: nowrap; }
+        th:first-child { position: sticky; left: 0; background: #222; z-index: 11; border-right: 2px solid #ccc;}
+        .sum-row { background: #eee; font-weight: bold; }
+        .status-A { background-color: #d4edda !important; }
+        .status-E { background-color: #fff3cd !important; }
+        .status-U { background-color: #f8d7da !important; }
+        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; color: white; transition: 0.2s; }
+        .btn-green { background: #28a745; }
+        .btn-blue { background: #007bff; }
+        .btn-yellow { background: #ffc107; color: black; }
+        .btn-red { background: #dc3545; }
+        .btn-gray { background: #6c757d; }
+        .btn-orange { background: #fd7e14; }
+        .btn-purple { background: #6f42c1; }
+        button:hover { opacity: 0.8; }
+        select { border: none; background: transparent; width: 100%; cursor: pointer; font-weight: bold; text-align-last: center; }
+        .delete-btn { color: #ccc; cursor: pointer; margin-left: 8px; font-size: 10px; }
+        .delete-btn:hover { color: #ff4444; }
+        .date-delete { display: inline-block; color: #ff6666; margin-top: 4px; cursor: pointer; font-size: 14px; }
+        input[type="checkbox"] { transform: scale(1.3); cursor: pointer; }
     </style>
 </head>
-
 <body>
 
     <div class="controls">
@@ -275,27 +54,27 @@
         <button class="btn-orange" onclick="addSpecialColumn()">Checkbox-Spalte +</button>
         <button class="btn-yellow" onclick="addManualDate()">Einzeltermin +</button>
         <button class="btn-blue" onclick="exportCSV()">Export CSV (Excel)</button>
-        <button class="btn-gray" onclick="toggleConfig()">⚙️ Einstellungen</button>
+        <button class="btn-gray" onclick="toggleConfig()">⚙️ Einstellungen / Backup</button>
         <button class="btn-red" style="margin-left: auto;" onclick="resetAll()">Reset All</button>
     </div>
 
     <div id="configSection" class="config-section">
-        <h3>Kalender-Einstellungen</h3>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-            <label>Aktuelles Jahr: <input type="number" id="cfgYear" value="2026" style="width: 70px;"></label>
-            <label>Ferienzeiträume (JJJJ-MM-TT bis JJJJ-MM-TT):<br>
-                <textarea id="cfgFerien" rows="5" style="width: 100%; font-family: monospace;">2025-12-22 bis 2026-01-06
-2026-02-16 bis 2026-02-20
-2026-03-30 bis 2026-04-10
-2026-05-26 bis 2026-06-05
-2026-07-30 bis 2026-09-11
-2026-10-26 bis 2026-10-30</textarea>
-            </label>
-            <button class="btn-red" onclick="rebuildCalendar()" style="width: fit-content;">⚠️ Kalender für dieses Jahr neu generieren</button>
+        <h3>Einstellungen & Datensicherung</h3>
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <label>Aktuelles Jahr: <input type="number" id="cfgYear" value="2026" style="width: 70px;"> 
+            <button class="btn-red" onclick="rebuildCalendar()" style="padding: 5px 10px;">Kalender für dieses Jahr neu generieren</button></label>
+            <label>Ferien (JJJJ-MM-TT bis JJJJ-MM-TT):<br>
+            <textarea id="cfgFerien" rows="3" style="width: 100%; margin-top:5px;">2025-12-22 bis 2026-01-06&#10;2026-07-30 bis 2026-09-11</textarea></label>
+            <hr>
+            <div>
+                <strong>Daten-Backup (Umzug auf anderes Gerät):</strong><br><br>
+                <button class="btn-purple" onclick="createBackup()">Backup-Code kopieren</button>
+                <button class="btn-blue" onclick="importBackup()">Backup einspielen</button>
+            </div>
         </div>
     </div>
 
-    <div class="tab-container" id="tabs">
+    <div class="tab-container">
         <div class="tab active" onclick="switchTab('Kleine')">Kleine</div>
         <div class="tab" onclick="switchTab('Große')">Große</div>
         <div class="tab" onclick="switchTab('Betreuer')">Betreuer</div>
@@ -303,319 +82,155 @@
 
     <div class="table-container">
         <table>
-            <thead>
-                <tr id="headerRow">
-                    <th>Name</th>
-                </tr>
-            </thead>
+            <thead><tr id="headerRow"><th>Name</th></tr></thead>
             <tbody id="memberBody"></tbody>
-            <tfoot>
-                <tr id="sumRow" class="sum-row">
-                    <td>Summe (Anwesend)</td>
-                </tr>
-            </tfoot>
+            <tfoot><tr id="sumRow" class="sum-row"><td>Summe (Anwesend)</td></tr></tfoot>
         </table>
     </div>
 
     <script>
-        let state = {
-            year: 2026,
-            ferienRaw: "",
-            dates: [],
-            specials: [],
-            members: [],
-            currentTab: 'Kleine'
-        };
-
-        function toggleConfig() {
-            const sec = document.getElementById('configSection');
-            sec.style.display = sec.style.display === 'block' ? 'none' : 'block';
-        }
+        let state = { year: 2026, ferienRaw: "", dates: [], specials: [], members: [], currentTab: 'Kleine' };
+        const STORAGE_KEY = 'jf_ehingen_vFinal';
 
         function init() {
-            const saved = localStorage.getItem('jf_ehingen_v19');
-            if (saved) {
-                state = JSON.parse(saved);
-                document.getElementById('cfgYear').value = state.year;
-                document.getElementById('cfgFerien').value = state.ferienRaw;
-            } else {
-                state.ferienRaw = document.getElementById('cfgFerien').value;
-                rebuildCalendar(false);
-            }
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) { state = JSON.parse(saved); document.getElementById('cfgYear').value = state.year; document.getElementById('cfgFerien').value = state.ferienRaw; }
+            else { state.ferienRaw = document.getElementById('cfgFerien').value; rebuildCalendar(false); }
             document.getElementById('yearDisplay').innerText = state.year;
             switchTab(state.currentTab);
         }
 
-        function formatDateString(str) {
-            if (!str) return "";
-            const parts = str.split('.');
-            if (parts.length !== 3) return str;
-            return parts[0].padStart(2, '0') + '.' + parts[1].padStart(2, '0') + '.' + parts[2];
-        }
-
-        function parseDate(str) {
-            const parts = str.split('.');
-            return new Date(parts[2], parts[1] - 1, parts[0]);
-        }
-
-        function sortDatesAndAttendance() {
-            const combined = state.dates.map((dateObj, index) => ({
-                dateObj,
-                index
-            }));
-            combined.sort((a, b) => parseDate(a.dateObj.d) - parseDate(b.dateObj.d));
-            const newDates = combined.map(c => c.dateObj);
-            state.members.forEach(m => {
-                m.attendance = combined.map(c => m.attendance[c.index]);
-            });
-            state.dates = newDates;
-        }
-
-        function switchTab(tabName) {
-            state.currentTab = tabName;
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(t => {
-                t.classList.toggle('active', t.innerText === tabName);
-            });
-            document.getElementById('activeTabName').innerText = tabName;
+        function switchTab(tab) {
+            state.currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.innerText === tab));
+            document.getElementById('activeTabName').innerText = tab;
             render();
         }
 
         function render() {
-            sortDatesAndAttendance();
-            state.members.sort((a, b) => a.name.localeCompare(b.name, 'de', {
-                sensitivity: 'base'
-            }));
+            sortData();
+            const header = document.getElementById('headerRow');
+            const body = document.getElementById('memberBody');
+            const footer = document.getElementById('sumRow');
 
-            const headerRow = document.getElementById('headerRow');
-            const memberBody = document.getElementById('memberBody');
-            const sumRow = document.getElementById('sumRow');
-
-            headerRow.innerHTML = '<th>Name</th>';
-
-            // Statistik Header
-            headerRow.innerHTML += '<th class="stat-header">Σ A</th><th class="stat-header">Σ E</th><th class="stat-header">Σ U</th>';
-
-            // Checkbox Header
-            state.specials.forEach((title, idx) => {
-                const th = document.createElement('th');
-                th.className = 'special-col';
-                th.innerHTML = `
-                    <div style="color:rgba(255,255,255,0.7); font-size:9px; margin-bottom: 2px;">CHECKBOX <span class="delete-btn" onclick="removeSpecialColumn(${idx})">✕</span></div>
-                    <textarea class="special-title-input" onchange="editSpecialTitle(${idx}, this.value)">${title}</textarea>
-                `;
-                headerRow.appendChild(th);
+            header.innerHTML = '<th>Name</th><th title="Anwesend">Σ A</th><th title="Entschuldigt">Σ E</th><th title="Unentschuldigt">Σ U</th>';
+            state.specials.forEach((s, i) => {
+                header.innerHTML += `<th class="special-col">
+                    <div style="font-size:9px; opacity:0.7;">CHECKBOX <span class="delete-btn" onclick="removeSpecialCol(${i})">✕</span></div>
+                    <textarea class="special-title-input" onchange="editSpec(${i}, this.value)">${s}</textarea>
+                </th>`;
+            });
+            state.dates.forEach((d, i) => {
+                header.innerHTML += `<th>
+                    <input type="text" value="${d.d}" onchange="editDate(${i}, 'd', this.value)" class="header-input" style="font-weight:bold; border-bottom:1px solid rgba(255,255,255,0.3);"><br>
+                    <input type="text" value="${d.t}" placeholder="..." onchange="editDate(${i}, 't', this.value)" class="header-input">
+                    <div class="date-delete" onclick="removeDate(${i})">🗑️</div>
+                </th>`;
             });
 
-            // Termin Header
-            state.dates.forEach((dateObj, index) => {
-                const th = document.createElement('th');
-                th.innerHTML = `
-                    <input type="text" value="${dateObj.d}" onchange="editDate(${index}, 'd', this.value)" class="header-input" style="font-weight:bold; border-bottom:1px solid rgba(255,255,255,0.3);"><br>
-                    <input type="text" value="${dateObj.t || ''}" placeholder="..." onchange="editDate(${index}, 't', this.value)" class="header-input">
-                    <div class="date-delete" onclick="removeDate(${index})" title="Termin löschen">🗑️</div>
-                `;
-                headerRow.appendChild(th);
-            });
+            body.innerHTML = '';
+            let dateSums = new Array(state.dates.length).fill(0);
+            state.members.filter(m => m.category === state.currentTab).forEach((m, mIdx) => {
+                const globalIdx = state.members.indexOf(m);
+                const sA = m.attendance.filter(a => a === 'A').length;
+                const sE = m.attendance.filter(a => a === 'E').length;
+                const sU = m.attendance.filter(a => a === 'U').length;
 
-            memberBody.innerHTML = '';
-            let sumsPerDate = new Array(state.dates.length).fill(0);
-
-            state.members.forEach((m, mIdx) => {
-                if (m.category !== state.currentTab) return;
-
-                const sumA = m.attendance.filter(a => a === 'A').length;
-                const sumE = m.attendance.filter(a => a === 'E').length;
-                const sumU = m.attendance.filter(a => a === 'U').length;
-
-                const tr = document.createElement('tr');
-                let cols = `<td>${m.name} <span class="delete-btn" onclick="deleteMember(${mIdx})">✕</span></td>`;
-
-                // Statistik Spalten einfügen
-                cols += `<td class="stat-col">${sumA}</td><td class="stat-col">${sumE}</td><td class="stat-col">${sumU}</td>`;
-
-                // Checkbox Spalten
+                let row = `<tr><td>${m.name} <span class="delete-btn" onclick="deleteMember(${globalIdx})">✕</span></td>
+                           <td class="stat-col">${sA}</td><td class="stat-col">${sE}</td><td class="stat-col">${sU}</td>`;
+                
                 state.specials.forEach((_, sIdx) => {
-                    const checked = m.specialStates && m.specialStates[sIdx] ? 'checked' : '';
-                    cols += `<td><input type="checkbox" ${checked} onchange="updateSpecial(${mIdx}, ${sIdx}, this.checked)"></td>`;
+                    row += `<td><input type="checkbox" ${m.specialStates[sIdx] ? 'checked' : ''} onchange="updateSpec(${globalIdx}, ${sIdx}, this.checked)"></td>`;
                 });
 
-                // Termin Spalten
                 state.dates.forEach((_, dIdx) => {
                     const val = m.attendance[dIdx] || '-';
-                    if (val === 'A') sumsPerDate[dIdx]++;
-                    cols += `<td class="status-${val}"><select onchange="updateStatus(${mIdx}, ${dIdx}, this.value)">
+                    if(val === 'A') dateSums[dIdx]++;
+                    row += `<td class="status-${val}"><select onchange="updateAtt(${globalIdx}, ${dIdx}, this.value)">
                         <option value="-" ${val==='-'?'selected':''}>-</option>
                         <option value="A" ${val==='A'?'selected':''}>A</option>
                         <option value="E" ${val==='E'?'selected':''}>E</option>
                         <option value="U" ${val==='U'?'selected':''}>U</option>
                     </select></td>`;
                 });
-                tr.innerHTML = cols;
-                memberBody.appendChild(tr);
+                body.innerHTML += row + '</tr>';
             });
 
-            // Summenzeile unten
-            sumRow.innerHTML = '<td>Summe (Anwesend)</td>';
-            sumRow.innerHTML += '<td></td><td></td><td></td>'; // Leerfelder für Statistik-Spalten
-            sumRow.innerHTML += new Array(state.specials.length).fill('<td></td>').join('');
-            sumRow.innerHTML += sumsPerDate.map(s => `<td>${s}</td>`).join('');
+            footer.innerHTML = `<td>Summe (Anwesend)</td><td></td><td></td><td></td>` + 
+                               state.specials.map(() => '<td></td>').join('') + 
+                               dateSums.map(s => `<td>${s}</td>`).join('');
 
-            localStorage.setItem('jf_ehingen_v19', JSON.stringify(state));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
 
-        // --- Standard Funktionen ---
-        function addMember() {
-            const input = document.getElementById('nameInput');
-            if (!input.value.trim()) return;
-            state.members.push({
-                name: input.value.trim(),
-                category: state.currentTab,
-                attendance: new Array(state.dates.length).fill('-'),
-                specialStates: new Array(state.specials.length).fill(false)
+        function sortData() {
+            state.members.sort((a,b) => a.name.localeCompare(b.name, 'de'));
+            state.dates.sort((a,b) => {
+                const parse = (s) => { const p = s.split('.'); return new Date(p[2], p[1]-1, p[0]); };
+                return parse(a.d) - parse(b.d);
             });
-            input.value = '';
-            render();
-            input.focus();
+        }
+
+        function addMember() {
+            const inp = document.getElementById('nameInput');
+            if(!inp.value.trim()) return;
+            state.members.push({ name: inp.value.trim(), category: state.currentTab, attendance: new Array(state.dates.length).fill('-'), specialStates: new Array(state.specials.length).fill(false) });
+            inp.value = ''; render(); inp.focus();
         }
 
         function rebuildCalendar(ask = true) {
-            if (ask && !confirm("Kalender neu generieren?")) return;
+            if(ask && !confirm("Kalender neu generieren?")) return;
             state.year = parseInt(document.getElementById('cfgYear').value);
             state.ferienRaw = document.getElementById('cfgFerien').value;
-            const lines = state.ferienRaw.split('\n');
-            const ferienList = lines.filter(l => l.includes(' bis ')).map(l => {
-                const parts = l.split(' bis ');
-                return [parts[0].trim(), parts[1].trim()];
-            });
+            const ferien = state.ferienRaw.split('\n').filter(l => l.includes(' bis ')).map(l => l.split(' bis '));
             state.dates = [];
             let d = new Date(state.year, 0, 1);
-            while (d.getDay() !== 2) {
-                d.setDate(d.getDate() + 1);
-            }
-            while (d.getFullYear() === state.year) {
-                const dateStr = d.toISOString().split('T')[0];
-                const isFrei = ferienList.some(f => dateStr >= f[0] && dateStr <= f[1]);
-                if (!isFrei) {
-                    state.dates.push({
-                        d: formatDateString(d.toLocaleDateString('de-DE')),
-                        t: ""
-                    });
+            while(d.getDay() !== 2) d.setDate(d.getDate()+1);
+            while(d.getFullYear() === state.year) {
+                const s = d.toISOString().split('T')[0];
+                if(!ferien.some(f => s >= f[0] && s <= f[1])) {
+                    state.dates.push({ d: d.toLocaleDateString('de-DE').split('.').map(p => p.padStart(2,'0')).join('.'), t: "" });
                 }
-                d.setDate(d.getDate() + 7);
+                d.setDate(d.getDate()+7);
             }
-            state.members.forEach(m => {
-                m.attendance = new Array(state.dates.length).fill('-');
-            });
-            render();
-            if (ask) toggleConfig();
+            state.members.forEach(m => m.attendance = new Array(state.dates.length).fill('-'));
+            render(); if(ask) toggleConfig();
         }
 
-        function addManualDate() {
-            let newD = prompt("Datum (z.B. 1.3.2026):", "");
-            if (newD) {
-                state.dates.push({
-                    d: formatDateString(newD),
-                    t: ""
-                });
-                state.members.forEach(m => m.attendance.push('-'));
-                render();
-            }
+        function toggleConfig() { const s = document.getElementById('configSection'); s.style.display = s.style.display === 'block' ? 'none' : 'block'; }
+        function addManualDate() { const d = prompt("Datum (TT.MM.JJJJ):"); if(d) { state.dates.push({d, t:""}); state.members.forEach(m => m.attendance.push('-')); render(); } }
+        function addSpecialColumn() { const t = prompt("Name der Spalte:"); if(t) { state.specials.push(t); state.members.forEach(m => m.specialStates.push(false)); render(); } }
+        function editDate(i, f, v) { state.dates[i][f] = v; render(); }
+        function editSpec(i, v) { state.specials[i] = v; render(); }
+        function updateAtt(mI, dI, v) { state.members[mI].attendance[dI] = v; render(); }
+        function updateSpec(mI, sI, v) { state.members[mI].specialStates[sI] = v; render(); }
+        function removeDate(i) { if(confirm("Löschen?")) { state.dates.splice(i,1); state.members.forEach(m => m.attendance.splice(i,1)); render(); } }
+        function removeSpecialCol(i) { if(confirm("Löschen?")) { state.specials.splice(i,1); state.members.forEach(m => m.specialStates.splice(i,1)); render(); } }
+        function deleteMember(i) { if(confirm("Mitglied löschen?")) { state.members.splice(i,1); render(); } }
+        function resetAll() { if(confirm("Alles löschen?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
+
+        function createBackup() {
+            const code = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+            navigator.clipboard.writeText(code).then(() => alert("Backup-Code in Zwischenablage kopiert!"));
         }
 
-        function addSpecialColumn() {
-            const title = prompt("Name der Checkbox-Spalte:", "Einverständniserklärung");
-            if (title) {
-                state.specials.push(title);
-                state.members.forEach(m => {
-                    if (!m.specialStates) m.specialStates = [];
-                    m.specialStates.push(false);
-                });
-                render();
-            }
-        }
-
-        function removeDate(idx) {
-            if (confirm("Termin löschen?")) {
-                state.dates.splice(idx, 1);
-                state.members.forEach(m => m.attendance.splice(idx, 1));
-                render();
-            }
-        }
-
-        function editDate(idx, field, val) {
-            if (field === 'd') val = formatDateString(val);
-            state.dates[idx][field] = val;
-            render();
-        }
-
-        function editSpecialTitle(idx, val) {
-            state.specials[idx] = val;
-            render();
-        }
-
-        function updateStatus(mIdx, dIdx, val) {
-            state.members[mIdx].attendance[dIdx] = val;
-            render();
-        }
-
-        function updateSpecial(mIdx, sIdx, val) {
-            state.members[mIdx].specialStates[sIdx] = val;
-            localStorage.setItem('jf_ehingen_v19', JSON.stringify(state));
-        }
-
-        function deleteMember(idx) {
-            if (confirm("Mitglied löschen?")) {
-                state.members.splice(idx, 1);
-                render();
-            }
-        }
-
-        function removeSpecialColumn(idx) {
-            if (confirm("Spalte löschen?")) {
-                state.specials.splice(idx, 1);
-                state.members.forEach(m => m.specialStates.splice(idx, 1));
-                render();
-            }
-        }
-
-        function resetAll() {
-            if (confirm("Alles löschen?")) {
-                localStorage.removeItem('jf_ehingen_v19');
-                location.reload();
-            }
+        function importBackup() {
+            const code = prompt("Backup-Code einfügen:");
+            if(code) { try { state = JSON.parse(decodeURIComponent(escape(atob(code)))); render(); alert("Erfolg!"); } catch(e) { alert("Fehler!"); } }
         }
 
         function exportCSV() {
-            let csvContent = "Kategorie;Name;Summe A;Summe E;Summe U;" + state.specials.join(";") + ";" + state.dates.map(d => d.d).join(";") + "\r\n";
-            const sortedMembers = [...state.members].sort((a, b) => {
-                const catOrder = {
-                    "Kleine": 1,
-                    "Große": 2,
-                    "Betreuer": 3
-                };
-                if (a.category !== b.category) return catOrder[a.category] - catOrder[b.category];
-                return a.name.localeCompare(b.name, 'de');
+            let csv = "Kategorie;Name;Summe A;Summe E;Summe U;" + state.specials.join(";") + ";" + state.dates.map(d => d.d).join(";") + "\r\n";
+            csv += ";Thema;;;;" + state.specials.map(() => "").join(";") + ";" + state.dates.map(d => d.t).join(";") + "\r\n";
+            state.members.forEach(m => {
+                const s = [m.attendance.filter(a=>a==='A').length, m.attendance.filter(a=>a==='E').length, m.attendance.filter(a=>a==='U').length];
+                csv += `${m.category};${m.name};${s[0]};${s[1]};${s[2]};${m.specialStates.map(v => v?'JA':'NEIN').join(';')};${m.attendance.join(';')}\r\n`;
             });
-            sortedMembers.forEach(m => {
-                const sA = m.attendance.filter(a => a === 'A').length;
-                const sE = m.attendance.filter(a => a === 'E').length;
-                const sU = m.attendance.filter(a => a === 'U').length;
-                const specVals = state.specials.map((_, i) => (m.specialStates && m.specialStates[i]) ? "JA" : "NEIN");
-                csvContent += `${m.category};${m.name};${sA};${sE};${sU};${specVals.join(";")};${m.attendance.join(";")}\r\n`;
-            });
-            const BOM = "\uFEFF";
-            const blob = new Blob([BOM + csvContent], {
-                type: 'text/csv;charset=utf-8;'
-            });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `JF_Ehingen_Gesamt.csv`;
-            link.click();
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `JF_Planer_${state.year}.csv`; link.click();
         }
 
         window.onload = init;
     </script>
 </body>
-
 </html>
