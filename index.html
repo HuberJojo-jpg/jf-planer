@@ -2,34 +2,24 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anwesenheitsplaner JF Ehingen</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JF Ehingen Planer</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/491/491410.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
-        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
-        .controls { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .config-section { background: #eee; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
-        h2 { color: #e10000; margin: 0 0 10px 0; width: 100%; }
-        .tab-container { display: flex; gap: 5px; margin-bottom: -1px; }
-        .tab { padding: 10px 20px; background: #ddd; border: 1px solid #ccc; border-bottom: none; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; color: #555; transition: 0.2s; }
-        .tab.active { background: white; color: #e10000; border-bottom: 2px solid white; z-index: 2; }
-        .table-container { background: white; padding: 10px; border-radius: 0 8px 8px 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); overflow-x: auto; border-top: 1px solid #ccc; }
-        table { border-collapse: collapse; min-width: 100%; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-        th { background: #333; color: white; font-size: 12px; vertical-align: top; }
-        th.special-col { background: #0056b3; min-width: 100px; max-width: 140px; word-wrap: break-word; hyphens: auto; }
-        .stat-col { background: #f8f9fa; font-weight: bold; min-width: 40px; }
-        .special-title-input { background: transparent; border: none; color: white; font-size: 11px; text-align: center; width: 100%; resize: none; font-family: inherit; overflow: hidden; height: auto; display: block; margin: 0 auto 5px auto; line-height: 1.3; }
-        .header-input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; text-align: center; font-size: 12px; padding: 4px; width: 90px; }
-        td:first-child { text-align: left; font-weight: bold; position: sticky; left: 0; background: white; z-index: 10; min-width: 180px; border-right: 2px solid #ccc; white-space: nowrap; }
-        th:first-child { position: sticky; left: 0; background: #222; z-index: 11; border-right: 2px solid #ccc;}
-        .sum-row { background: #eee; font-weight: bold; }
-        .status-A { background-color: #d4edda !important; }
-        .status-E { background-color: #fff3cd !important; }
-        .status-U { background-color: #f8d7da !important; }
-        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; color: white; transition: 0.2s; }
+        :root { --fire-red: #e10000; --dark-gray: #333; --light-gray: #f4f4f4; }
+        
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 10px; background-color: var(--light-gray); color: #333; line-height: 1.4; }
+        
+        /* Controls-Bereich optimiert für Mobile */
+        .controls { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 15px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .controls h2 { font-size: 1.2rem; color: var(--fire-red); margin: 0 0 10px 0; width: 100%; text-align: center; }
+        
+        input[type="text"], input[type="number"], textarea { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; /* Verhindert Auto-Zoom auf iOS */ }
+        #nameInput { flex-grow: 1; min-width: 150px; }
+
+        button { padding: 10px 14px; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s; }
         .btn-green { background: #28a745; }
         .btn-blue { background: #007bff; }
         .btn-yellow { background: #ffc107; color: black; }
@@ -37,41 +27,75 @@
         .btn-gray { background: #6c757d; }
         .btn-orange { background: #fd7e14; }
         .btn-purple { background: #6f42c1; }
-        button:hover { opacity: 0.8; }
-        select { border: none; background: transparent; width: 100%; cursor: pointer; font-weight: bold; text-align-last: center; }
-        .delete-btn { color: #ccc; cursor: pointer; margin-left: 8px; font-size: 10px; }
-        .delete-btn:hover { color: #ff4444; }
-        .date-delete { display: inline-block; color: #ff6666; margin-top: 4px; cursor: pointer; font-size: 14px; }
-        input[type="checkbox"] { transform: scale(1.3); cursor: pointer; }
+
+        /* Tabs */
+        .tab-container { display: flex; gap: 4px; margin-bottom: -1px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .tab { padding: 12px 18px; background: #ddd; border-radius: 10px 10px 0 0; cursor: pointer; font-weight: bold; color: #555; white-space: nowrap; border: 1px solid #ccc; border-bottom: none; }
+        .tab.active { background: white; color: var(--fire-red); border-bottom: 2px solid white; z-index: 2; }
+
+        /* TABELLE MIT FIXIERTER SPALTE */
+        .table-container { background: white; padding: 5px; border-radius: 0 12px 12px 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow-x: auto; position: relative; border-top: 1px solid #ccc; }
+        table { border-collapse: collapse; min-width: 100%; font-size: 13px; }
+        
+        th, td { border: 1px solid #ddd; padding: 6px 4px; text-align: center; height: 44px; /* Touch-freundliche Höhe */ }
+        th { background: #444; color: white; vertical-align: top; }
+
+        /* Erste Spalte (Name) fixieren */
+        td:first-child, th:first-child { 
+            position: sticky; left: 0; z-index: 20; background: white; min-width: 130px; max-width: 130px;
+            text-align: left; font-weight: bold; border-right: 2px solid #bbb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        th:first-child { background: #222; z-index: 21; color: white; }
+
+        /* Checkbox-Spalten */
+        th.special-col { background: #0056b3; min-width: 80px; max-width: 100px; }
+        .special-title-input { background: transparent; border: none; color: white; font-size: 10px; text-align: center; width: 100%; resize: none; line-height: 1.2; padding: 0; hyphens: auto; }
+
+        /* Termin-Spalten */
+        .header-input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; text-align: center; font-size: 11px; padding: 3px; width: 80px; border-radius: 4px; }
+        
+        .stat-col { background: #f0f0f0; font-weight: bold; min-width: 35px; }
+        .status-A { background-color: #d4edda !important; }
+        .status-E { background-color: #fff3cd !important; }
+        .status-U { background-color: #f8d7da !important; }
+        
+        select { border: none; background: transparent; width: 100%; height: 100%; font-size: 14px; font-weight: bold; cursor: pointer; text-align-last: center; -webkit-appearance: none; }
+        
+        .delete-btn { color: #ccc; font-size: 12px; margin-left: 5px; cursor: pointer; }
+        .date-delete { color: #ff8888; font-size: 16px; cursor: pointer; display: block; margin-top: 4px; }
+
+        /* Konfig Bereich */
+        .config-section div { margin-bottom: 10px; }
+
+        @media (max-width: 600px) {
+            body { margin: 5px; }
+            .controls { padding: 10px; }
+            button { flex-grow: 1; padding: 12px 8px; }
+            td:first-child, th:first-child { min-width: 100px; max-width: 100px; font-size: 12px; }
+        }
     </style>
 </head>
 <body>
 
     <div class="controls">
-        <h2>🚒 JF Ehingen Planer <span id="yearDisplay">2026</span></h2>
-        <input type="text" id="nameInput" placeholder="Vorname Nachname" onkeypress="if(event.key === 'Enter') addMember()">
-        <button class="btn-green" onclick="addMember()">Hinzufügen zu <span id="activeTabName">Kleine</span></button>
-        <button class="btn-orange" onclick="addSpecialColumn()">Checkbox-Spalte +</button>
-        <button class="btn-yellow" onclick="addManualDate()">Einzeltermin +</button>
-        <button class="btn-blue" onclick="exportCSV()">Export CSV (Excel)</button>
-        <button class="btn-gray" onclick="toggleConfig()">⚙️ Einstellungen / Backup</button>
-        <button class="btn-red" style="margin-left: auto;" onclick="resetAll()">Reset All</button>
+        <h2>🚒 JF Ehingen Planer</h2>
+        <input type="text" id="nameInput" placeholder="Name eingeben..." onkeypress="if(event.key === 'Enter') addMember()">
+        <button class="btn-green" onclick="addMember()">➕ Hinzufügen</button>
+        <button class="btn-orange" onclick="addSpecialColumn()">☑️ Liste</button>
+        <button class="btn-yellow" onclick="addManualDate()">📅 Termin</button>
+        <button class="btn-blue" onclick="exportCSV()">💾 CSV</button>
+        <button class="btn-gray" onclick="toggleConfig()">⚙️ Setup</button>
     </div>
 
     <div id="configSection" class="config-section">
-        <h3>Einstellungen & Datensicherung</h3>
-        <div style="display: flex; flex-direction: column; gap: 15px;">
-            <label>Aktuelles Jahr: <input type="number" id="cfgYear" value="2026" style="width: 70px;"> 
-            <button class="btn-red" onclick="rebuildCalendar()" style="padding: 5px 10px;">Kalender für dieses Jahr neu generieren</button></label>
-            <label>Ferien (JJJJ-MM-TT bis JJJJ-MM-TT):<br>
-            <textarea id="cfgFerien" rows="3" style="width: 100%; margin-top:5px;">2025-12-22 bis 2026-01-06&#10;2026-07-30 bis 2026-09-11</textarea></label>
-            <hr>
-            <div>
-                <strong>Daten-Backup (Umzug auf anderes Gerät):</strong><br><br>
-                <button class="btn-purple" onclick="createBackup()">Backup-Code kopieren</button>
-                <button class="btn-blue" onclick="importBackup()">Backup einspielen</button>
-            </div>
+        <h3>Einstellungen & Backup</h3>
+        <div>Jahr: <input type="number" id="cfgYear" value="2026" style="width: 80px;"> <button class="btn-red" onclick="rebuildCalendar()" style="display:inline-block; padding: 5px;">Neu generieren</button></div>
+        <hr>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-purple" onclick="createBackup()" style="flex:1;">Backup Code kopieren</button>
+            <button class="btn-blue" onclick="importBackup()" style="flex:1;">Backup einspielen</button>
         </div>
+        <button class="btn-red" onclick="resetAll()" style="margin-top:10px; width:100%;">⚠️ Alles löschen</button>
     </div>
 
     <div class="tab-container">
@@ -81,72 +105,81 @@
     </div>
 
     <div class="table-container">
-        <table>
-            <thead><tr id="headerRow"><th>Name</th></tr></thead>
+        <table id="mainTable">
+            <thead><tr id="headerRow"></tr></thead>
             <tbody id="memberBody"></tbody>
-            <tfoot><tr id="sumRow" class="sum-row"><td>Summe (Anwesend)</td></tr></tfoot>
+            <tfoot><tr id="sumRow" class="sum-row"></tr></tfoot>
         </table>
     </div>
 
     <script>
-        let state = { year: 2026, ferienRaw: "", dates: [], specials: [], members: [], currentTab: 'Kleine' };
-        const STORAGE_KEY = 'jf_ehingen_vFinal';
+        let state = { year: 2026, ferienRaw: "2025-12-22 bis 2026-01-06\n2026-07-30 bis 2026-09-11", dates: [], specials: [], members: [], currentTab: 'Kleine' };
+        const STORAGE_KEY = 'jf_ehingen_vFinal_Mobile';
 
         function init() {
             const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) { state = JSON.parse(saved); document.getElementById('cfgYear').value = state.year; document.getElementById('cfgFerien').value = state.ferienRaw; }
-            else { state.ferienRaw = document.getElementById('cfgFerien').value; rebuildCalendar(false); }
-            document.getElementById('yearDisplay').innerText = state.year;
+            if (saved) { 
+                state = JSON.parse(saved); 
+                document.getElementById('cfgYear').value = state.year;
+            } else { 
+                rebuildCalendar(false); 
+            }
             switchTab(state.currentTab);
         }
 
         function switchTab(tab) {
             state.currentTab = tab;
             document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.innerText === tab));
-            document.getElementById('activeTabName').innerText = tab;
             render();
         }
 
         function render() {
-            sortData();
+            state.members.sort((a,b) => a.name.localeCompare(b.name, 'de'));
+            state.dates.sort((a,b) => {
+                const pA = a.d.split('.'); const pB = b.d.split('.');
+                return new Date(pA[2], pA[1]-1, pA[0]) - new Date(pB[2], pB[1]-1, pB[0]);
+            });
+
             const header = document.getElementById('headerRow');
             const body = document.getElementById('memberBody');
             const footer = document.getElementById('sumRow');
 
-            header.innerHTML = '<th>Name</th><th title="Anwesend">Σ A</th><th title="Entschuldigt">Σ E</th><th title="Unentschuldigt">Σ U</th>';
+            // Header
+            header.innerHTML = `<th>Name</th><th class="stat-header">A</th><th class="stat-header">E</th><th class="stat-header">U</th>`;
             state.specials.forEach((s, i) => {
                 header.innerHTML += `<th class="special-col">
-                    <div style="font-size:9px; opacity:0.7;">CHECKBOX <span class="delete-btn" onclick="removeSpecialCol(${i})">✕</span></div>
+                    <span class="delete-btn" onclick="removeSpecialCol(${i})">✕</span>
                     <textarea class="special-title-input" onchange="editSpec(${i}, this.value)">${s}</textarea>
                 </th>`;
             });
             state.dates.forEach((d, i) => {
                 header.innerHTML += `<th>
-                    <input type="text" value="${d.d}" onchange="editDate(${i}, 'd', this.value)" class="header-input" style="font-weight:bold; border-bottom:1px solid rgba(255,255,255,0.3);"><br>
+                    <input type="text" value="${d.d}" onchange="editDate(${i}, 'd', this.value)" class="header-input" style="font-weight:bold;"><br>
                     <input type="text" value="${d.t}" placeholder="..." onchange="editDate(${i}, 't', this.value)" class="header-input">
-                    <div class="date-delete" onclick="removeDate(${i})">🗑️</div>
+                    <span class="date-delete" onclick="removeDate(${i})">🗑️</span>
                 </th>`;
             });
 
+            // Body
             body.innerHTML = '';
             let dateSums = new Array(state.dates.length).fill(0);
-            state.members.filter(m => m.category === state.currentTab).forEach((m, mIdx) => {
-                const globalIdx = state.members.indexOf(m);
+            state.members.filter(m => m.category === state.currentTab).forEach((m) => {
+                const gIdx = state.members.indexOf(m);
                 const sA = m.attendance.filter(a => a === 'A').length;
                 const sE = m.attendance.filter(a => a === 'E').length;
                 const sU = m.attendance.filter(a => a === 'U').length;
 
-                let row = `<tr><td>${m.name} <span class="delete-btn" onclick="deleteMember(${globalIdx})">✕</span></td>
+                let row = `<tr><td>${m.name} <span class="delete-btn" onclick="deleteMember(${gIdx})">✕</span></td>
                            <td class="stat-col">${sA}</td><td class="stat-col">${sE}</td><td class="stat-col">${sU}</td>`;
                 
                 state.specials.forEach((_, sIdx) => {
-                    row += `<td><input type="checkbox" ${m.specialStates[sIdx] ? 'checked' : ''} onchange="updateSpec(${globalIdx}, ${sIdx}, this.checked)"></td>`;
+                    row += `<td><input type="checkbox" ${m.specialStates[sIdx] ? 'checked' : ''} onchange="updateSpec(${gIdx}, ${sIdx}, this.checked)"></td>`;
                 });
 
                 state.dates.forEach((_, dIdx) => {
                     const val = m.attendance[dIdx] || '-';
                     if(val === 'A') dateSums[dIdx]++;
-                    row += `<td class="status-${val}"><select onchange="updateAtt(${globalIdx}, ${dIdx}, this.value)">
+                    row += `<td class="status-${val}"><select onchange="updateAtt(${gIdx}, ${dIdx}, this.value)">
                         <option value="-" ${val==='-'?'selected':''}>-</option>
                         <option value="A" ${val==='A'?'selected':''}>A</option>
                         <option value="E" ${val==='E'?'selected':''}>E</option>
@@ -156,19 +189,12 @@
                 body.innerHTML += row + '</tr>';
             });
 
-            footer.innerHTML = `<td>Summe (Anwesend)</td><td></td><td></td><td></td>` + 
+            // Footer
+            footer.innerHTML = `<td>Summe (A)</td><td></td><td></td><td></td>` + 
                                state.specials.map(() => '<td></td>').join('') + 
                                dateSums.map(s => `<td>${s}</td>`).join('');
 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        }
-
-        function sortData() {
-            state.members.sort((a,b) => a.name.localeCompare(b.name, 'de'));
-            state.dates.sort((a,b) => {
-                const parse = (s) => { const p = s.split('.'); return new Date(p[2], p[1]-1, p[0]); };
-                return parse(a.d) - parse(b.d);
-            });
         }
 
         function addMember() {
@@ -179,16 +205,15 @@
         }
 
         function rebuildCalendar(ask = true) {
-            if(ask && !confirm("Kalender neu generieren?")) return;
+            if(ask && !confirm("Kalender neu generieren? (Löscht Anwesenheiten)")) return;
             state.year = parseInt(document.getElementById('cfgYear').value);
-            state.ferienRaw = document.getElementById('cfgFerien').value;
             const ferien = state.ferienRaw.split('\n').filter(l => l.includes(' bis ')).map(l => l.split(' bis '));
             state.dates = [];
             let d = new Date(state.year, 0, 1);
             while(d.getDay() !== 2) d.setDate(d.getDate()+1);
             while(d.getFullYear() === state.year) {
                 const s = d.toISOString().split('T')[0];
-                if(!ferien.some(f => s >= f[0] && s <= f[1])) {
+                if(!ferien.some(f => s >= f[0].trim() && s <= f[1].trim())) {
                     state.dates.push({ d: d.toLocaleDateString('de-DE').split('.').map(p => p.padStart(2,'0')).join('.'), t: "" });
                 }
                 d.setDate(d.getDate()+7);
@@ -199,35 +224,34 @@
 
         function toggleConfig() { const s = document.getElementById('configSection'); s.style.display = s.style.display === 'block' ? 'none' : 'block'; }
         function addManualDate() { const d = prompt("Datum (TT.MM.JJJJ):"); if(d) { state.dates.push({d, t:""}); state.members.forEach(m => m.attendance.push('-')); render(); } }
-        function addSpecialColumn() { const t = prompt("Name der Spalte:"); if(t) { state.specials.push(t); state.members.forEach(m => m.specialStates.push(false)); render(); } }
+        function addSpecialColumn() { const t = prompt("Name der Liste:"); if(t) { state.specials.push(t); state.members.forEach(m => m.specialStates.push(false)); render(); } }
         function editDate(i, f, v) { state.dates[i][f] = v; render(); }
         function editSpec(i, v) { state.specials[i] = v; render(); }
         function updateAtt(mI, dI, v) { state.members[mI].attendance[dI] = v; render(); }
-        function updateSpec(mI, sI, v) { state.members[mI].specialStates[sI] = v; render(); }
-        function removeDate(i) { if(confirm("Löschen?")) { state.dates.splice(i,1); state.members.forEach(m => m.attendance.splice(i,1)); render(); } }
-        function removeSpecialCol(i) { if(confirm("Löschen?")) { state.specials.splice(i,1); state.members.forEach(m => m.specialStates.splice(i,1)); render(); } }
+        function updateSpec(mI, sI, v) { state.members[mI].specialStates[sI] = v; localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+        function removeDate(i) { if(confirm("Termin löschen?")) { state.dates.splice(i,1); state.members.forEach(m => m.attendance.splice(i,1)); render(); } }
+        function removeSpecialCol(i) { if(confirm("Spalte löschen?")) { state.specials.splice(i,1); state.members.forEach(m => m.specialStates.splice(i,1)); render(); } }
         function deleteMember(i) { if(confirm("Mitglied löschen?")) { state.members.splice(i,1); render(); } }
-        function resetAll() { if(confirm("Alles löschen?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
+        function resetAll() { if(confirm("Wirklich alles löschen?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
 
         function createBackup() {
             const code = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
-            navigator.clipboard.writeText(code).then(() => alert("Backup-Code in Zwischenablage kopiert!"));
+            navigator.clipboard.writeText(code).then(() => alert("Backup-Code kopiert!"));
         }
 
         function importBackup() {
-            const code = prompt("Backup-Code einfügen:");
-            if(code) { try { state = JSON.parse(decodeURIComponent(escape(atob(code)))); render(); alert("Erfolg!"); } catch(e) { alert("Fehler!"); } }
+            const code = prompt("Code einfügen:");
+            if(code) { try { state = JSON.parse(decodeURIComponent(escape(atob(code)))); render(); alert("Import erfolgreich!"); } catch(e) { alert("Fehler beim Import!"); } }
         }
 
         function exportCSV() {
-            let csv = "Kategorie;Name;Summe A;Summe E;Summe U;" + state.specials.join(";") + ";" + state.dates.map(d => d.d).join(";") + "\r\n";
-            csv += ";Thema;;;;" + state.specials.map(() => "").join(";") + ";" + state.dates.map(d => d.t).join(";") + "\r\n";
+            let csv = "Kategorie;Name;A;E;U;" + state.specials.join(";") + ";" + state.dates.map(d => d.d).join(";") + "\r\n";
             state.members.forEach(m => {
                 const s = [m.attendance.filter(a=>a==='A').length, m.attendance.filter(a=>a==='E').length, m.attendance.filter(a=>a==='U').length];
                 csv += `${m.category};${m.name};${s[0]};${s[1]};${s[2]};${m.specialStates.map(v => v?'JA':'NEIN').join(';')};${m.attendance.join(';')}\r\n`;
             });
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `JF_Planer_${state.year}.csv`; link.click();
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `JF_Ehingen_Export.csv`; link.click();
         }
 
         window.onload = init;
