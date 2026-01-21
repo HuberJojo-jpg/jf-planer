@@ -45,6 +45,7 @@
         }
         
         input[type="text"],
+        input[type="date"],
         textarea {
             padding: 10px;
             border: 1px solid #ccc;
@@ -215,7 +216,6 @@
             background: #eee;
             color: #000;
         }
-        /* CHECKBOX SPALTE MIT HYPHENS */
         
         th.special-col {
             background: #d0e1f9;
@@ -233,7 +233,6 @@
             font-size: 12px;
             text-align: center;
             width: 95%;
-            height: auto;
             min-height: 40px;
             resize: vertical;
             line-height: 1.2;
@@ -244,13 +243,12 @@
             padding: 4px;
             word-wrap: break-word;
             hyphens: auto;
-            /* Automatische Trennung */
             -webkit-hyphens: auto;
         }
         
         th.date-col {
-            width: 125px;
-            min-width: 125px;
+            width: 135px;
+            min-width: 135px;
         }
         
         .stat-col {
@@ -296,6 +294,27 @@
             font-size: 14px;
             font-weight: normal;
         }
+        /* Modal Style */
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 300px;
+            text-align: center;
+        }
         
         @media (max-width: 768px) {
             th:first-child,
@@ -314,10 +333,21 @@
         <h2>🚒 JF Ehingen Planer 2026</h2>
         <input type="text" id="nameInput" placeholder="Name..." onkeypress="if(event.key === 'Enter') addMember()">
         <button class="btn-green" onclick="addMember()">➕ Hinzufügen</button>
-        <button class="btn-orange" onclick="addSpecialColumn()">☑️ Liste +</button>
-        <button class="btn-yellow" onclick="addManualDate()">📅 Termin +</button>
+        <button class="btn-orange" onclick="addSpecialColumn()">☑️ Liste</button>
+        <button class="btn-yellow" onclick="showDateModal()">📅 Termin +</button>
         <button class="btn-blue" onclick="exportCSV()">💾 Export</button>
         <button class="btn-gray" onclick="toggleConfig()">⚙️ Setup</button>
+    </div>
+
+    <div id="dateModal" class="modal">
+        <div class="modal-content">
+            <h3>Termin hinzufügen</h3>
+            <input type="date" id="newDateInput" style="width:90%; margin-bottom:15px;">
+            <div style="display:flex; gap:10px;">
+                <button class="btn-green" style="flex:1" onclick="addManualDate()">Hinzufügen</button>
+                <button class="btn-red" style="flex:1" onclick="closeDateModal()">Abbrechen</button>
+            </div>
+        </div>
     </div>
 
     <div id="configSection" class="config-section">
@@ -360,7 +390,7 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'jf_ehingen_2026_HYPHEN_FIX';
+        const STORAGE_KEY = 'jf_ehingen_2026_DATEPICKER_V1';
         let state = {
             year: 2026,
             dates: [],
@@ -383,21 +413,21 @@
             switchTab(state.currentTab);
         }
 
-        function switchTab(tab) {
-            state.currentTab = tab;
-            document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.innerText === tab));
-            render();
+        // Hilfsfunktion: Wandelt ISO (YYYY-MM-DD) in Anzeige (DD.MM.YYYY) um
+        function isoToDe(iso) {
+            const p = iso.split('-');
+            return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : iso;
+        }
+
+        // Hilfsfunktion: Wandelt Anzeige (DD.MM.YYYY) in ISO (YYYY-MM-DD) um
+        function deToIso(de) {
+            const p = de.split('.');
+            return p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : de;
         }
 
         function render() {
             state.members.sort((a, b) => (a.name || "").localeCompare(b.name || "", 'de'));
-            state.dates.sort((a, b) => {
-                const pA = a.d.split('.');
-                const pB = b.d.split('.');
-                const valA = pA[2] + pA[1].padStart(2, '0') + pA[0].padStart(2, '0');
-                const valB = pB[2] + pB[1].padStart(2, '0') + pB[0].padStart(2, '0');
-                return valA.localeCompare(valB);
-            });
+            state.dates.sort((a, b) => deToIso(a.d).localeCompare(deToIso(b.d)));
 
             const header = document.getElementById('headerRow');
             const body = document.getElementById('memberBody');
@@ -411,7 +441,11 @@
                 </th>`;
             });
             state.dates.forEach((d, i) => {
-                headHTML += `<th class="date-col"><input type="text" value="${d.d}" onchange="editDate(${i}, 'd', this.value)" class="header-input"><br><input type="text" value="${d.t || ''}" placeholder="Thema..." onchange="editDate(${i}, 't', this.value)" class="header-input" style="font-weight:normal; margin-top:3px;"><span class="date-delete" onclick="removeDate(${i})">🗑️</span></th>`;
+                headHTML += `<th class="date-col">
+                    <input type="date" value="${deToIso(d.d)}" onchange="editDate(${i}, 'd', isoToDe(this.value))" class="header-input"><br>
+                    <input type="text" value="${d.t || ''}" placeholder="Thema..." onchange="editDate(${i}, 't', this.value)" class="header-input" style="font-weight:normal; margin-top:3px;">
+                    <span class="date-delete" onclick="removeDate(${i})">🗑️</span>
+                </th>`;
             });
             headHTML += `<th style="width:45px; background:#f0f0f0;">🗑️</th>`;
             header.innerHTML = headHTML;
@@ -471,7 +505,7 @@
                 const iso = `${y}-${mo}-${da}`;
                 if (!ranges.some(f => iso >= f[0].trim() && iso <= f[1].trim())) {
                     state.dates.push({
-                        d: `${da}.${mo}.${y}`,
+                        d: isoToDe(iso),
                         t: ""
                     });
                 }
@@ -493,6 +527,28 @@
             });
             inp.value = '';
             render();
+        }
+
+        // Kalender Modal Funktionen
+        function showDateModal() {
+            document.getElementById('dateModal').style.display = 'block';
+        }
+
+        function closeDateModal() {
+            document.getElementById('dateModal').style.display = 'none';
+        }
+
+        function addManualDate() {
+            const val = document.getElementById('newDateInput').value;
+            if (val) {
+                state.dates.push({
+                    d: isoToDe(val),
+                    t: ""
+                });
+                state.members.forEach(m => m.attendance.push('-'));
+                closeDateModal();
+                render();
+            }
         }
 
         function editMemberName(idx, newName) {
@@ -543,28 +599,10 @@
             }
         }
 
-        function addManualDate() {
-            const d = prompt("Datum (TT.MM.JJJJ):");
-            if (d) {
-                state.dates.push({
-                    d,
-                    t: ""
-                });
-                state.members.forEach(m => m.attendance.push('-'));
-                render();
-            }
-        }
-
-        function addSpecialColumn() {
-            const t = prompt("Name der Liste:");
-            if (t) {
-                state.specials.push(t);
-                state.members.forEach(m => {
-                    if (!m.specialStates) m.specialStates = [];
-                    m.specialStates.push(false);
-                });
-                render();
-            }
+        function switchTab(tab) {
+            state.currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.innerText === tab));
+            render();
         }
 
         function toggleConfig() {
@@ -574,7 +612,7 @@
 
         function createBackup() {
             const code = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
-            navigator.clipboard.writeText(code).then(() => alert("Sicherungscode kopiert!"));
+            navigator.clipboard.writeText(code).then(() => alert("Code kopiert!"));
         }
 
         function importBackup() {
@@ -598,9 +636,7 @@
         }
 
         function exportCSV() {
-            // Hilfsfunktion um Text Excel-sicher zu machen (keine Zeilenumbrüche)
             const clean = (txt) => txt ? txt.replace(/\r?\n|\r/g, " ").trim() : "";
-
             let csv = "Kategorie;Name;A;E;U;" + state.specials.map(s => clean(s)).join(";") + ";" + state.dates.map(d => d.d).join(";") + "\r\n";
             state.members.forEach(m => {
                 const s = [m.attendance.filter(a => a === 'A').length, m.attendance.filter(a => a === 'E').length, m.attendance.filter(a => a === 'U').length];
