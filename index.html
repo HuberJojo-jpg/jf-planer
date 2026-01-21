@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JF Ehingen Planer 2026</title>
+    <title>JF Ehingen Planer</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/491/491410.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <style>
@@ -280,10 +280,18 @@
             color: black;
         }
         
-        .row-delete-btn {
-            color: #ff8888;
+        .row-action-btn {
             cursor: pointer;
             font-size: 18px;
+            margin: 0 4px;
+        }
+        
+        .row-delete-btn {
+            color: #ff8888;
+        }
+        
+        .row-move-btn {
+            color: #007bff;
         }
         
         .date-delete {
@@ -294,7 +302,6 @@
             font-size: 14px;
             font-weight: normal;
         }
-        /* Modal Style */
         
         .modal {
             display: none;
@@ -328,9 +335,8 @@
 </head>
 
 <body>
-
     <div class="controls">
-        <h2>🚒 JF Ehingen Planer 2026</h2>
+        <h2>🚒 JF Ehingen Planer</h2>
         <input type="text" id="nameInput" placeholder="Name..." onkeypress="if(event.key === 'Enter') addMember()">
         <button class="btn-green" onclick="addMember()">➕ Hinzufügen</button>
         <button class="btn-orange" onclick="addSpecialColumn()">☑️ Liste</button>
@@ -390,7 +396,7 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'jf_ehingen_2026_DATEPICKER_V1';
+        const STORAGE_KEY = 'jf_ehingen_2026_FINAL_REPAIR_V2';
         let state = {
             year: 2026,
             dates: [],
@@ -405,7 +411,9 @@
             if (saved) {
                 state = JSON.parse(saved);
                 document.getElementById('ferienInput').value = state.ferienRaw || document.getElementById('ferienInput').value;
-                if (!state.dates || state.dates.length === 0) rebuildCalendar(false);
+                if (!state.dates) state.dates = [];
+                if (!state.specials) state.specials = [];
+                if (!state.dates.length) rebuildCalendar(false);
                 else render();
             } else {
                 rebuildCalendar(false);
@@ -413,13 +421,11 @@
             switchTab(state.currentTab);
         }
 
-        // Hilfsfunktion: Wandelt ISO (YYYY-MM-DD) in Anzeige (DD.MM.YYYY) um
         function isoToDe(iso) {
             const p = iso.split('-');
             return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : iso;
         }
 
-        // Hilfsfunktion: Wandelt Anzeige (DD.MM.YYYY) in ISO (YYYY-MM-DD) um
         function deToIso(de) {
             const p = de.split('.');
             return p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : de;
@@ -434,12 +440,14 @@
             const footer = document.getElementById('sumRow');
 
             let headHTML = `<th>Name</th><th class="stat-header">A</th><th class="stat-header">E</th><th class="stat-header">U</th>`;
+
             state.specials.forEach((s, i) => {
                 headHTML += `<th class="special-col">
                     <div style="font-size:9px; color:#555;">LISTE <span onclick="removeSpecialCol(${i})" style="color:red; cursor:pointer; font-weight:bold; margin-left:5px;">✕</span></div>
                     <textarea class="special-title-input" onchange="editSpec(${i}, this.value)" lang="de">${s}</textarea>
                 </th>`;
             });
+
             state.dates.forEach((d, i) => {
                 headHTML += `<th class="date-col">
                     <input type="date" value="${deToIso(d.d)}" onchange="editDate(${i}, 'd', isoToDe(this.value))" class="header-input"><br>
@@ -447,7 +455,7 @@
                     <span class="date-delete" onclick="removeDate(${i})">🗑️</span>
                 </th>`;
             });
-            headHTML += `<th style="width:45px; background:#f0f0f0;">🗑️</th>`;
+            headHTML += `<th style="width:70px; background:#f0f0f0;">Aktion</th>`;
             header.innerHTML = headHTML;
 
             body.innerHTML = '';
@@ -465,7 +473,8 @@
                     <td class="stat-col">${sA}</td><td class="stat-col">${sE}</td><td class="stat-col">${sU}</td>`;
 
                 state.specials.forEach((_, sIdx) => {
-                    rowHTML += `<td><input type="checkbox" style="transform: scale(1.2);" ${m.specialStates[sIdx] ? 'checked' : ''} onchange="updateSpec(${gIdx}, ${sIdx}, this.checked)"></td>`;
+                    const isChecked = m.specialStates && m.specialStates[sIdx] ? 'checked' : '';
+                    rowHTML += `<td><input type="checkbox" style="transform: scale(1.2);" ${isChecked} onchange="updateSpec(${gIdx}, ${sIdx}, this.checked)"></td>`;
                 });
 
                 state.dates.forEach((_, dIdx) => {
@@ -473,7 +482,10 @@
                     if (val === 'A') dateSums[dIdx]++;
                     rowHTML += `<td class="status-${val}"><select onchange="updateAtt(${gIdx}, ${dIdx}, this.value)"><option value="-" ${val==='-'?'selected':''}>-</option><option value="A" ${val==='A'?'selected':''}>A</option><option value="E" ${val==='E'?'selected':''}>E</option><option value="U" ${val==='U'?'selected':''}>U</option></select></td>`;
                 });
-                rowHTML += `<td><span class="row-delete-btn" onclick="deleteMember(${gIdx})">🗑️</span></td></tr>`;
+                rowHTML += `<td>
+                    <span class="row-action-btn row-move-btn" onclick="moveMember(${gIdx})" title="Verschieben">➡️</span>
+                    <span class="row-action-btn row-delete-btn" onclick="deleteMember(${gIdx})" title="Löschen">🗑️</span>
+                </td></tr>`;
                 body.innerHTML += rowHTML;
             });
 
@@ -486,8 +498,29 @@
             });
             footHTML += `<td style="background:#eee;"></td>`;
             footer.innerHTML = footHTML;
-
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function moveMember(idx) {
+            const categories = ['Kleine', 'Große', 'Betreuer'];
+            const current = state.members[idx].category;
+            const next = categories[(categories.indexOf(current) + 1) % categories.length];
+            if (confirm(`${state.members[idx].name} nach '${next}' verschieben?`)) {
+                state.members[idx].category = next;
+                render();
+            }
+        }
+
+        function addSpecialColumn() {
+            const t = prompt("Name der neuen Liste (z.B. Bekleidung):");
+            if (t) {
+                state.specials.push(t);
+                state.members.forEach(m => {
+                    if (!m.specialStates) m.specialStates = [];
+                    m.specialStates.push(false);
+                });
+                render();
+            }
         }
 
         function rebuildCalendar(ask = true) {
@@ -529,7 +562,6 @@
             render();
         }
 
-        // Kalender Modal Funktionen
         function showDateModal() {
             document.getElementById('dateModal').style.display = 'block';
         }
@@ -562,8 +594,9 @@
         }
 
         function updateSpec(mI, sI, v) {
+            if (!state.members[mI].specialStates) state.members[mI].specialStates = [];
             state.members[mI].specialStates[sI] = v;
-            render();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
 
         function editDate(i, f, v) {
@@ -577,7 +610,7 @@
         }
 
         function removeDate(i) {
-            if (confirm("Terminspalte löschen?")) {
+            if (confirm("Spalte löschen?")) {
                 state.dates.splice(i, 1);
                 state.members.forEach(m => m.attendance.splice(i, 1));
                 render();
@@ -585,15 +618,17 @@
         }
 
         function removeSpecialCol(i) {
-            if (confirm("Listenspalte löschen?")) {
+            if (confirm("Liste löschen?")) {
                 state.specials.splice(i, 1);
-                state.members.forEach(m => m.specialStates.splice(i, 1));
+                state.members.forEach(m => {
+                    if (m.specialStates) m.specialStates.splice(i, 1);
+                });
                 render();
             }
         }
 
         function deleteMember(i) {
-            if (confirm("Mitglied löschen?")) {
+            if (confirm("Löschen?")) {
                 state.members.splice(i, 1);
                 render();
             }
@@ -636,18 +671,19 @@
         }
 
         function exportCSV() {
-            const clean = (txt) => txt ? txt.replace(/\r?\n|\r/g, " ").trim() : "";
+            const clean = (t) => t ? String(t).replace(/\r?\n|\r/g, " ").trim() : "";
             let csv = "Kategorie;Name;A;E;U;" + state.specials.map(s => clean(s)).join(";") + ";" + state.dates.map(d => d.d).join(";") + "\r\n";
             state.members.forEach(m => {
                 const s = [m.attendance.filter(a => a === 'A').length, m.attendance.filter(a => a === 'E').length, m.attendance.filter(a => a === 'U').length];
-                csv += `${m.category};${clean(m.name)};${s[0]};${s[1]};${s[2]};${m.specialStates.map(v => v?'JA':'NEIN').join(';')};${m.attendance.join(';')}\r\n`;
+                const sp = state.specials.map((_, i) => (m.specialStates && m.specialStates[i]) ? 'JA' : 'NEIN');
+                csv += `${m.category};${clean(m.name)};${s[0]};${s[1]};${s[2]};${sp.join(';')};${m.attendance.join(';')}\r\n`;
             });
             const blob = new Blob(["\uFEFF" + csv], {
                 type: 'text/csv;charset=utf-8;'
             });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `JF_Ehingen_2026.csv`;
+            link.download = `JF_Ehingen_Gesamt.csv`;
             link.click();
         }
         window.onload = init;
