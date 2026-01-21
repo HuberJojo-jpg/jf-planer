@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JF Ehingen Planer</title>
+    <title>JF Ehingen Planer 2026</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/491/491410.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
-        :root { --fire-red: #e10000; --dark-gray: #333; --light-gray: #f4f4f4; }
+        :root { --fire-red: #e10000; --jf-blue: #0056b3; --dark-gray: #333; --light-gray: #f4f4f4; --active-green: #28a745; }
         
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 10px; background-color: var(--light-gray); color: #333; line-height: 1.4; }
+        body { font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 15px; background-color: var(--light-gray); color: var(--dark-gray); }
         
-        /* Controls-Bereich optimiert für Mobile */
-        .controls { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 15px; display: flex; gap: 8px; flex-wrap: wrap; }
-        .controls h2 { font-size: 1.2rem; color: var(--fire-red); margin: 0 0 10px 0; width: 100%; text-align: center; }
+        .controls { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .controls h2 { font-size: 1.4rem; color: var(--fire-red); margin: 0 0 10px 0; width: 100%; text-align: left; border-bottom: 2px solid var(--light-gray); padding-bottom: 10px; }
         
-        input[type="text"], input[type="number"], textarea { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; /* Verhindert Auto-Zoom auf iOS */ }
-        #nameInput { flex-grow: 1; min-width: 150px; }
+        input[type="text"], input[type="number"], textarea { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; background: #fff; }
+        #nameInput { flex-grow: 2; min-width: 200px; border: 2px solid #ddd; }
 
-        button { padding: 10px 14px; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s; }
-        .btn-green { background: #28a745; }
+        button { padding: 12px 16px; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; font-size: 14px; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-green { background: var(--active-green); }
         .btn-blue { background: #007bff; }
         .btn-yellow { background: #ffc107; color: black; }
         .btn-red { background: #dc3545; }
@@ -28,84 +27,88 @@
         .btn-orange { background: #fd7e14; }
         .btn-purple { background: #6f42c1; }
 
-        /* Tabs */
-        .tab-container { display: flex; gap: 4px; margin-bottom: -1px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .tab { padding: 12px 18px; background: #ddd; border-radius: 10px 10px 0 0; cursor: pointer; font-weight: bold; color: #555; white-space: nowrap; border: 1px solid #ccc; border-bottom: none; }
-        .tab.active { background: white; color: var(--fire-red); border-bottom: 2px solid white; z-index: 2; }
+        .config-section { background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: none; border: 2px solid #eee; width: 100%; box-sizing: border-box; }
 
-        /* TABELLE MIT FIXIERTER SPALTE */
-        .table-container { background: white; padding: 5px; border-radius: 0 12px 12px 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow-x: auto; position: relative; border-top: 1px solid #ccc; }
-        table { border-collapse: collapse; min-width: 100%; font-size: 13px; }
+        /* Tabs mit Gruppenfarben */
+        .tab-container { display: flex; gap: 5px; margin-bottom: -1px; }
+        .tab { padding: 12px 25px; background: #e0e0e0; border-radius: 10px 10px 0 0; cursor: pointer; font-weight: bold; color: #666; border: 1px solid #ccc; border-bottom: none; transition: 0.3s; }
         
-        th, td { border: 1px solid #ddd; padding: 6px 4px; text-align: center; height: 44px; /* Touch-freundliche Höhe */ }
-        th { background: #444; color: white; vertical-align: top; }
+        .tab-kleine.active { background: white; color: var(--fire-red); border-bottom: 3px solid white; border-top: 3px solid var(--fire-red); z-index: 5; }
+        .tab-grosse.active { background: white; color: var(--jf-blue); border-bottom: 3px solid white; border-top: 3px solid var(--jf-blue); z-index: 5; }
+        .tab-betreuer.active { background: white; color: #333; border-bottom: 3px solid white; border-top: 3px solid #333; z-index: 5; }
 
-        /* Erste Spalte (Name) fixieren */
-        td:first-child, th:first-child { 
-            position: sticky; left: 0; z-index: 20; background: white; min-width: 130px; max-width: 130px;
-            text-align: left; font-weight: bold; border-right: 2px solid #bbb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        th:first-child { background: #222; z-index: 21; color: white; }
+        .table-container { background: white; padding: 10px; border-radius: 0 12px 12px 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); overflow-x: auto; border-top: 1px solid #ccc; }
+        table { border-collapse: collapse; min-width: 100%; }
+        th, td { border: 1px solid #eee; padding: 10px 6px; text-align: center; }
+        th { background: #444; color: white; font-size: 12px; vertical-align: top; }
 
-        /* Checkbox-Spalten */
-        th.special-col { background: #0056b3; min-width: 80px; max-width: 100px; }
-        .special-title-input { background: transparent; border: none; color: white; font-size: 10px; text-align: center; width: 100%; resize: none; line-height: 1.2; padding: 0; hyphens: auto; }
+        td:first-child, th:first-child { position: sticky; left: 0; z-index: 30; background: white; min-width: 160px; text-align: left; font-weight: bold; border-right: 3px solid #ddd; }
+        th:first-child { background: #222; z-index: 31; }
 
-        /* Termin-Spalten */
-        .header-input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; text-align: center; font-size: 11px; padding: 3px; width: 80px; border-radius: 4px; }
+        th.special-col { background: var(--jf-blue); min-width: 100px; }
+        .special-title-input { background: transparent; border: none; color: white; font-size: 11px; text-align: center; width: 100%; resize: none; line-height: 1.3; padding: 0; }
+
+        .header-input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; text-align: center; font-size: 11px; padding: 5px; width: 85px; border-radius: 4px; }
+        .stat-col { background: #f9f9f9; font-weight: 800; color: #444; min-width: 40px; }
         
-        .stat-col { background: #f0f0f0; font-weight: bold; min-width: 35px; }
-        .status-A { background-color: #d4edda !important; }
-        .status-E { background-color: #fff3cd !important; }
-        .status-U { background-color: #f8d7da !important; }
+        .status-A { background-color: #d4edda !important; color: #155724; }
+        .status-E { background-color: #fff3cd !important; color: #856404; }
+        .status-U { background-color: #f8d7da !important; color: #721c24; }
         
-        select { border: none; background: transparent; width: 100%; height: 100%; font-size: 14px; font-weight: bold; cursor: pointer; text-align-last: center; -webkit-appearance: none; }
-        
-        .delete-btn { color: #ccc; font-size: 12px; margin-left: 5px; cursor: pointer; }
-        .date-delete { color: #ff8888; font-size: 16px; cursor: pointer; display: block; margin-top: 4px; }
+        select { border: none; background: transparent; width: 100%; height: 30px; font-size: 14px; font-weight: bold; cursor: pointer; text-align-last: center; }
+        .delete-btn { color: #bbb; margin-left: 8px; cursor: pointer; font-size: 12px; }
+        .date-delete { color: #ff8888; cursor: pointer; display: block; margin-top: 8px; font-size: 16px; }
 
-        /* Konfig Bereich */
-        .config-section div { margin-bottom: 10px; }
-
-        @media (max-width: 600px) {
-            body { margin: 5px; }
-            .controls { padding: 10px; }
-            button { flex-grow: 1; padding: 12px 8px; }
-            td:first-child, th:first-child { min-width: 100px; max-width: 100px; font-size: 12px; }
+        @media (max-width: 768px) {
+            .controls { padding: 15px; }
+            #nameInput { width: 100%; }
+            button { flex: 1; justify-content: center; }
+            td:first-child, th:first-child { min-width: 120px; font-size: 12px; }
         }
     </style>
 </head>
 <body>
 
     <div class="controls">
-        <h2>🚒 JF Ehingen Planer</h2>
-        <input type="text" id="nameInput" placeholder="Name eingeben..." onkeypress="if(event.key === 'Enter') addMember()">
+        <h2>🚒 JF Ehingen Planer 2026</h2>
+        <input type="text" id="nameInput" placeholder="Neues Mitglied..." onkeypress="if(event.key === 'Enter') addMember()">
         <button class="btn-green" onclick="addMember()">➕ Hinzufügen</button>
-        <button class="btn-orange" onclick="addSpecialColumn()">☑️ Liste</button>
-        <button class="btn-yellow" onclick="addManualDate()">📅 Termin</button>
-        <button class="btn-blue" onclick="exportCSV()">💾 CSV</button>
-        <button class="btn-gray" onclick="toggleConfig()">⚙️ Setup</button>
+        <button class="btn-orange" onclick="addSpecialColumn()">☑️ Checkbox</button>
+        <button class="btn-yellow" onclick="addManualDate()">📅 Termin +</button>
+        <button class="btn-blue" onclick="exportCSV()">💾 Export CSV</button>
+        <button class="btn-gray" onclick="toggleConfig()">⚙️ Setup / Backup</button>
     </div>
 
     <div id="configSection" class="config-section">
-        <h3>Einstellungen & Backup</h3>
-        <div>Jahr: <input type="number" id="cfgYear" value="2026" style="width: 80px;"> <button class="btn-red" onclick="rebuildCalendar()" style="display:inline-block; padding: 5px;">Neu generieren</button></div>
-        <hr>
-        <div style="display:flex; gap:10px;">
-            <button class="btn-purple" onclick="createBackup()" style="flex:1;">Backup Code kopieren</button>
-            <button class="btn-blue" onclick="importBackup()" style="flex:1;">Backup einspielen</button>
+        <h3>Einstellungen & BW Ferien 2026</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <p>Automatisch übersprungene Ferien BW 2026:</p>
+                <ul style="font-size: 0.8rem; color: #666;">
+                    <li>Weihnachten: bis 06.01.</li>
+                    <li>Ostern: 30.03. - 10.04.</li>
+                    <li>Pfingsten: 26.05. - 05.06.</li>
+                    <li>Sommer: 30.07. - 11.09.</li>
+                    <li>Herbst: 26.10. - 30.10.</li>
+                </ul>
+                <button class="btn-red" onclick="rebuildCalendar()">Kalender 2026 neu generieren</button>
+            </div>
+            <div style="border-left: 1px solid #ddd; padding-left: 20px;">
+                <strong>Backup & Umzug:</strong><br><br>
+                <button class="btn-purple" onclick="createBackup()">Backup Code kopieren</button>
+                <button class="btn-blue" onclick="importBackup()" style="margin-top: 5px;">Backup einspielen</button>
+            </div>
         </div>
-        <button class="btn-red" onclick="resetAll()" style="margin-top:10px; width:100%;">⚠️ Alles löschen</button>
     </div>
 
     <div class="tab-container">
-        <div class="tab active" onclick="switchTab('Kleine')">Kleine</div>
-        <div class="tab" onclick="switchTab('Große')">Große</div>
+        <div class="tab tab-kleine active" onclick="switchTab('Kleine')">Kleine</div>
+        <div class="tab tab-grosse" onclick="switchTab('Große')">Große</div>
         <div class="tab" onclick="switchTab('Betreuer')">Betreuer</div>
     </div>
 
     <div class="table-container">
-        <table id="mainTable">
+        <table>
             <thead><tr id="headerRow"></tr></thead>
             <tbody id="memberBody"></tbody>
             <tfoot><tr id="sumRow" class="sum-row"></tr></tfoot>
@@ -113,23 +116,34 @@
     </div>
 
     <script>
-        let state = { year: 2026, ferienRaw: "2025-12-22 bis 2026-01-06\n2026-07-30 bis 2026-09-11", dates: [], specials: [], members: [], currentTab: 'Kleine' };
-        const STORAGE_KEY = 'jf_ehingen_vFinal_Mobile';
+        // Definition der Ferien BW 2026
+        const ferienBW2026 = [
+            ['2025-12-22', '2026-01-06'], // Weihnachten
+            ['2026-03-30', '2026-04-10'], // Ostern
+            ['2026-05-26', '2026-06-05'], // Pfingsten
+            ['2026-07-30', '2026-09-11'], // Sommer
+            ['2026-10-26', '2026-10-30'], // Herbst
+            ['2026-12-23', '2026-12-31']  // Weihnachten 26
+        ];
+
+        let state = { year: 2026, dates: [], specials: [], members: [], currentTab: 'Kleine' };
+        const STORAGE_KEY = 'jf_ehingen_2026_final';
 
         function init() {
             const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) { 
-                state = JSON.parse(saved); 
-                document.getElementById('cfgYear').value = state.year;
-            } else { 
-                rebuildCalendar(false); 
-            }
+            if (saved) { state = JSON.parse(saved); }
+            else { rebuildCalendar(false); }
             switchTab(state.currentTab);
         }
 
         function switchTab(tab) {
             state.currentTab = tab;
-            document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.innerText === tab));
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.toggle('active', t.innerText === tab);
+                if (t.innerText === 'Kleine') t.className = 'tab tab-kleine' + (t.innerText === tab ? ' active' : '');
+                if (t.innerText === 'Große') t.className = 'tab tab-grosse' + (t.innerText === tab ? ' active' : '');
+                if (t.innerText === 'Betreuer') t.className = 'tab tab-betreuer' + (t.innerText === tab ? ' active' : '');
+            });
             render();
         }
 
@@ -144,8 +158,7 @@
             const body = document.getElementById('memberBody');
             const footer = document.getElementById('sumRow');
 
-            // Header
-            header.innerHTML = `<th>Name</th><th class="stat-header">A</th><th class="stat-header">E</th><th class="stat-header">U</th>`;
+            header.innerHTML = `<th>Name</th><th title="Anwesend">A</th><th title="Entschuldigt">E</th><th title="Unentschuldigt">U</th>`;
             state.specials.forEach((s, i) => {
                 header.innerHTML += `<th class="special-col">
                     <span class="delete-btn" onclick="removeSpecialCol(${i})">✕</span>
@@ -155,12 +168,11 @@
             state.dates.forEach((d, i) => {
                 header.innerHTML += `<th>
                     <input type="text" value="${d.d}" onchange="editDate(${i}, 'd', this.value)" class="header-input" style="font-weight:bold;"><br>
-                    <input type="text" value="${d.t}" placeholder="..." onchange="editDate(${i}, 't', this.value)" class="header-input">
+                    <input type="text" value="${d.t}" placeholder="Thema..." onchange="editDate(${i}, 't', this.value)" class="header-input">
                     <span class="date-delete" onclick="removeDate(${i})">🗑️</span>
                 </th>`;
             });
 
-            // Body
             body.innerHTML = '';
             let dateSums = new Array(state.dates.length).fill(0);
             state.members.filter(m => m.category === state.currentTab).forEach((m) => {
@@ -189,7 +201,6 @@
                 body.innerHTML += row + '</tr>';
             });
 
-            // Footer
             footer.innerHTML = `<td>Summe (A)</td><td></td><td></td><td></td>` + 
                                state.specials.map(() => '<td></td>').join('') + 
                                dateSums.map(s => `<td>${s}</td>`).join('');
@@ -197,29 +208,29 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
 
-        function addMember() {
-            const inp = document.getElementById('nameInput');
-            if(!inp.value.trim()) return;
-            state.members.push({ name: inp.value.trim(), category: state.currentTab, attendance: new Array(state.dates.length).fill('-'), specialStates: new Array(state.specials.length).fill(false) });
-            inp.value = ''; render(); inp.focus();
-        }
-
         function rebuildCalendar(ask = true) {
-            if(ask && !confirm("Kalender neu generieren? (Löscht Anwesenheiten)")) return;
-            state.year = parseInt(document.getElementById('cfgYear').value);
-            const ferien = state.ferienRaw.split('\n').filter(l => l.includes(' bis ')).map(l => l.split(' bis '));
+            if(ask && !confirm("Kalender für 2026 neu generieren? Bestehende Anwesenheiten werden gelöscht!")) return;
             state.dates = [];
-            let d = new Date(state.year, 0, 1);
-            while(d.getDay() !== 2) d.setDate(d.getDate()+1);
-            while(d.getFullYear() === state.year) {
-                const s = d.toISOString().split('T')[0];
-                if(!ferien.some(f => s >= f[0].trim() && s <= f[1].trim())) {
+            let d = new Date(2026, 0, 1);
+            while(d.getDay() !== 2) d.setDate(d.getDate()+1); // Erster Dienstag
+            
+            while(d.getFullYear() === 2026) {
+                const iso = d.toISOString().split('T')[0];
+                const isFrei = ferienBW2026.some(f => iso >= f[0] && iso <= f[1]);
+                if(!isFrei) {
                     state.dates.push({ d: d.toLocaleDateString('de-DE').split('.').map(p => p.padStart(2,'0')).join('.'), t: "" });
                 }
                 d.setDate(d.getDate()+7);
             }
             state.members.forEach(m => m.attendance = new Array(state.dates.length).fill('-'));
             render(); if(ask) toggleConfig();
+        }
+
+        function addMember() {
+            const inp = document.getElementById('nameInput');
+            if(!inp.value.trim()) return;
+            state.members.push({ name: inp.value.trim(), category: state.currentTab, attendance: new Array(state.dates.length).fill('-'), specialStates: new Array(state.specials.length).fill(false) });
+            inp.value = ''; render(); inp.focus();
         }
 
         function toggleConfig() { const s = document.getElementById('configSection'); s.style.display = s.style.display === 'block' ? 'none' : 'block'; }
@@ -232,16 +243,15 @@
         function removeDate(i) { if(confirm("Termin löschen?")) { state.dates.splice(i,1); state.members.forEach(m => m.attendance.splice(i,1)); render(); } }
         function removeSpecialCol(i) { if(confirm("Spalte löschen?")) { state.specials.splice(i,1); state.members.forEach(m => m.specialStates.splice(i,1)); render(); } }
         function deleteMember(i) { if(confirm("Mitglied löschen?")) { state.members.splice(i,1); render(); } }
-        function resetAll() { if(confirm("Wirklich alles löschen?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
-
+        
         function createBackup() {
             const code = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
-            navigator.clipboard.writeText(code).then(() => alert("Backup-Code kopiert!"));
+            navigator.clipboard.writeText(code).then(() => alert("Sicherungscode kopiert!"));
         }
 
         function importBackup() {
-            const code = prompt("Code einfügen:");
-            if(code) { try { state = JSON.parse(decodeURIComponent(escape(atob(code)))); render(); alert("Import erfolgreich!"); } catch(e) { alert("Fehler beim Import!"); } }
+            const code = prompt("Sicherungscode einfügen:");
+            if(code) { try { state = JSON.parse(decodeURIComponent(escape(atob(code)))); render(); alert("Erfolg!"); } catch(e) { alert("Fehler!"); } }
         }
 
         function exportCSV() {
@@ -251,7 +261,7 @@
                 csv += `${m.category};${m.name};${s[0]};${s[1]};${s[2]};${m.specialStates.map(v => v?'JA':'NEIN').join(';')};${m.attendance.join(';')}\r\n`;
             });
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `JF_Ehingen_Export.csv`; link.click();
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `JF_Ehingen_2026.csv`; link.click();
         }
 
         window.onload = init;
