@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,308 +7,98 @@
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/491/491410.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <style>
-         :root {
-            --fire-red: #e10000;
-            --jf-blue: #0056b3;
-            --dark-gray: #333;
-            --light-gray: #f4f4f4;
-            --active-green: #28a745;
-        }
+        :root { --fire-red: #e10000; --jf-blue: #0056b3; --dark-gray: #333; --light-gray: #f4f4f4; --active-green: #28a745; }
+        body { font-family: -apple-system, system-ui, sans-serif; margin: 15px; background-color: var(--light-gray); }
         
-        body {
-            font-family: -apple-system, system-ui, sans-serif;
-            margin: 15px;
-            background-color: var(--light-gray);
-        }
+        .controls { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .controls h2 { font-size: 1.4rem; color: var(--fire-red); margin: 0 0 10px 0; width: 100%; text-align: left; border-bottom: 2px solid var(--light-gray); padding-bottom: 10px; }
         
-        .controls {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
+        input[type="text"], textarea { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; color: black; }
+        #nameInput { flex-grow: 2; }
         
-        .controls h2 {
-            font-size: 1.4rem;
-            color: var(--fire-red);
-            margin: 0 0 10px 0;
-            width: 100%;
-            text-align: left;
-            border-bottom: 2px solid var(--light-gray);
-            padding-bottom: 10px;
-        }
+        button { padding: 12px 16px; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; font-size: 14px; }
+        .btn-green { background: var(--active-green); }
+        .btn-blue { background: #007bff; }
+        .btn-yellow { background: #ffc107; color: black; }
+        .btn-red { background: #dc3545; }
+        .btn-gray { background: #6c757d; }
+        .btn-orange { background: #fd7e14; }
+        .btn-purple { background: #6f42c1; }
+
+        .config-section { background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: none; border: 2px solid #eee; width: 100%; box-sizing: border-box; }
+
+        .tab-container { display: flex; gap: 4px; margin-bottom: -1px; }
+        .tab { padding: 12px 20px; background: #ddd; border-radius: 10px 10px 0 0; cursor: pointer; font-weight: bold; color: #555; border: 1px solid #ccc; border-bottom: none; font-size: 14px; }
+        .tab.active { background: white; color: var(--fire-red); border-bottom: 3px solid white; z-index: 5; border-top: 3px solid var(--fire-red); }
+
+        .table-container { background: white; padding: 10px; border-radius: 0 12px 12px 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); overflow-x: auto; border-top: 1px solid #ccc; min-height: 250px; }
+        table { border-collapse: collapse; min-width: 100%; table-layout: fixed; }
+        th, td { border: 1px solid #ddd; padding: 10px 6px; text-align: center; overflow: hidden; }
         
-        input[type="text"],
-        textarea {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 16px;
-            color: black;
-        }
+        th { background: #f0f0f0; color: #333; font-size: 11px; vertical-align: top; }
         
-        #nameInput {
-            flex-grow: 2;
+        th:first-child, td:first-child { 
+            position: sticky; left: 0; z-index: 40; background: #f9f9f9; 
+            width: 180px; min-width: 180px; max-width: 180px;
+            text-align: left; font-weight: bold; border-right: 3px solid #ccc; 
         }
+        th:first-child { background: #e0e0e0; color: #000; }
         
-        button {
-            padding: 12px 16px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
+        .name-edit-input { border: none; background: transparent; font-family: inherit; font-size: 14px; font-weight: bold; width: 100%; box-sizing: border-box; color: black; padding: 4px; }
+
+        .header-input { 
+            background: white; border: 1px solid #bbb; color: black !important; 
+            text-align: center; font-size: 12px; padding: 4px 2px; width: 100%; 
+            box-sizing: border-box; border-radius: 4px; font-weight: bold;
         }
+
+        th.stat-header, td.stat-col { width: 40px; min-width: 40px; background: #eee; color: #000; }
         
-        .btn-green {
-            background: var(--active-green);
-        }
+        /* CHECKBOX SPALTE MIT HYPHENS */
+        th.special-col { background: #d0e1f9; width: 125px; min-width: 125px; color: #000; vertical-align: middle; padding: 10px 5px; }
         
-        .btn-blue {
-            background: #007bff;
-        }
-        
-        .btn-yellow {
-            background: #ffc107;
-            color: black;
-        }
-        
-        .btn-red {
-            background: #dc3545;
-        }
-        
-        .btn-gray {
-            background: #6c757d;
-        }
-        
-        .btn-orange {
-            background: #fd7e14;
-        }
-        
-        .btn-purple {
-            background: #6f42c1;
-        }
-        
-        .config-section {
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: none;
-            border: 2px solid #eee;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        
-        .tab-container {
-            display: flex;
-            gap: 4px;
-            margin-bottom: -1px;
-        }
-        
-        .tab {
-            padding: 12px 20px;
-            background: #ddd;
-            border-radius: 10px 10px 0 0;
-            cursor: pointer;
-            font-weight: bold;
-            color: #555;
-            border: 1px solid #ccc;
-            border-bottom: none;
-            font-size: 14px;
-        }
-        
-        .tab.active {
-            background: white;
-            color: var(--fire-red);
-            border-bottom: 3px solid white;
-            z-index: 5;
-            border-top: 3px solid var(--fire-red);
-        }
-        
-        .table-container {
-            background: white;
-            padding: 10px;
-            border-radius: 0 12px 12px 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            overflow-x: auto;
-            border-top: 1px solid #ccc;
-            min-height: 250px;
-        }
-        
-        table {
-            border-collapse: collapse;
-            min-width: 100%;
-            table-layout: fixed;
-        }
-        
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 10px 6px;
-            text-align: center;
-            overflow: hidden;
-        }
-        
-        th {
-            background: #f0f0f0;
-            color: #333;
-            font-size: 11px;
-            vertical-align: top;
-        }
-        
-        th:first-child,
-        td:first-child {
-            position: sticky;
-            left: 0;
-            z-index: 40;
-            background: #f9f9f9;
-            width: 180px;
-            min-width: 180px;
-            max-width: 180px;
-            text-align: left;
-            font-weight: bold;
-            border-right: 3px solid #ccc;
-        }
-        
-        th:first-child {
-            background: #e0e0e0;
-            color: #000;
-        }
-        
-        .name-edit-input {
-            border: none;
-            background: transparent;
-            font-family: inherit;
-            font-size: 14px;
-            font-weight: bold;
-            width: 100%;
-            box-sizing: border-box;
-            color: black;
-            padding: 4px;
-        }
-        
-        .header-input {
-            background: white;
-            border: 1px solid #bbb;
-            color: black !important;
-            text-align: center;
-            font-size: 12px;
-            padding: 4px 2px;
-            width: 100%;
-            box-sizing: border-box;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        
-        th.stat-header,
-        td.stat-col {
-            width: 40px;
-            min-width: 40px;
-            background: #eee;
-            color: #000;
-        }
-        /* CHECKBOX SPALTE OPTIMIERT */
-        
-        th.special-col {
-            background: #d0e1f9;
-            width: 125px;
-            min-width: 125px;
-            color: #000;
-            vertical-align: middle;
-            padding: 10px 5px;
-        }
-        
-        .special-title-input {
-            background: white;
-            border: 1px solid #bbb;
-            color: black;
-            font-size: 12px;
-            text-align: center;
-            width: 90%;
-            height: 34px;
-            resize: none;
-            line-height: 1.2;
-            display: block;
-            margin: 5px auto 0 auto;
+        .special-title-input { 
+            background: white; 
+            border: 1px solid #bbb; 
+            color: black; 
+            font-size: 12px; 
+            text-align: center; 
+            width: 95%; 
+            height: auto;
+            min-height: 40px;
+            resize: vertical; 
+            line-height: 1.2; 
+            display: block; 
+            margin: 5px auto 0 auto; 
             border-radius: 4px;
             font-weight: bold;
             padding: 4px;
+            word-wrap: break-word;
+            hyphens: auto; /* Automatische Trennung */
+            -webkit-hyphens: auto;
         }
         
-        th.date-col {
-            width: 125px;
-            min-width: 125px;
-        }
+        th.date-col { width: 125px; min-width: 125px; }
+
+        .stat-col { background: #f9f9f9; font-weight: 800; color: #000; }
+        .status-A { background-color: #d4edda !important; }
+        .status-E { background-color: #fff3cd !important; }
+        .status-U { background-color: #f8d7da !important; }
         
-        .stat-col {
-            background: #f9f9f9;
-            font-weight: 800;
-            color: #000;
-        }
+        select { border: none; background: transparent; width: 100%; font-weight: bold; cursor: pointer; text-align-last: center; font-size: 14px; color: black; }
+        .row-delete-btn { color: #ff8888; cursor: pointer; font-size: 18px; }
+        .date-delete { color: #ff8888; cursor: pointer; display: block; margin-top: 8px; font-size: 14px; font-weight: normal; }
         
-        .status-A {
-            background-color: #d4edda !important;
-        }
-        
-        .status-E {
-            background-color: #fff3cd !important;
-        }
-        
-        .status-U {
-            background-color: #f8d7da !important;
-        }
-        
-        select {
-            border: none;
-            background: transparent;
-            width: 100%;
-            font-weight: bold;
-            cursor: pointer;
-            text-align-last: center;
-            font-size: 14px;
-            color: black;
-        }
-        
-        .row-delete-btn {
-            color: #ff8888;
-            cursor: pointer;
-            font-size: 18px;
-        }
-        
-        .date-delete {
-            color: #ff8888;
-            cursor: pointer;
-            display: block;
-            margin-top: 8px;
-            font-size: 14px;
-            font-weight: normal;
-        }
-        
-        @media (max-width: 768px) {
-            th:first-child,
-            td:first-child {
-                width: 140px;
-                min-width: 140px;
-                max-width: 140px;
-            }
-        }
+        @media (max-width: 768px) { th:first-child, td:first-child { width: 140px; min-width: 140px; max-width: 140px; } }
     </style>
 </head>
-
 <body>
 
     <div class="controls">
         <h2>🚒 JF Ehingen Planer 2026</h2>
         <input type="text" id="nameInput" placeholder="Name..." onkeypress="if(event.key === 'Enter') addMember()">
         <button class="btn-green" onclick="addMember()">➕ Hinzufügen</button>
-        <button class="btn-orange" onclick="addSpecialColumn()">☑️ Liste +</button>
+        <button class="btn-orange" onclick="addSpecialColumn()">☑️ Liste</button>
         <button class="btn-yellow" onclick="addManualDate()">📅 Termin +</button>
         <button class="btn-blue" onclick="exportCSV()">💾 Export</button>
         <button class="btn-gray" onclick="toggleConfig()">⚙️ Setup</button>
@@ -344,36 +133,25 @@
 
     <div class="table-container">
         <table>
-            <thead>
-                <tr id="headerRow"></tr>
-            </thead>
+            <thead><tr id="headerRow"></tr></thead>
             <tbody id="memberBody"></tbody>
-            <tfoot>
-                <tr id="sumRow" class="sum-row"></tr>
-            </tfoot>
+            <tfoot><tr id="sumRow" class="sum-row"></tr></tfoot>
         </table>
     </div>
 
     <script>
-        const STORAGE_KEY = 'jf_ehingen_2026_CENTER_FIX';
-        let state = {
-            year: 2026,
-            dates: [],
-            specials: [],
-            members: [],
-            currentTab: 'Kleine',
-            ferienRaw: ""
-        };
+        const STORAGE_KEY = 'jf_ehingen_2026_HYPHEN_FIX';
+        let state = { year: 2026, dates: [], specials: [], members: [], currentTab: 'Kleine', ferienRaw: "" };
 
         function init() {
             const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
+            if (saved) { 
                 state = JSON.parse(saved);
                 document.getElementById('ferienInput').value = state.ferienRaw || document.getElementById('ferienInput').value;
                 if (!state.dates || state.dates.length === 0) rebuildCalendar(false);
                 else render();
-            } else {
-                rebuildCalendar(false);
+            } else { 
+                rebuildCalendar(false); 
             }
             switchTab(state.currentTab);
         }
@@ -385,10 +163,9 @@
         }
 
         function render() {
-            state.members.sort((a, b) => (a.name || "").localeCompare(b.name || "", 'de'));
-            state.dates.sort((a, b) => {
-                const pA = a.d.split('.');
-                const pB = b.d.split('.');
+            state.members.sort((a,b) => (a.name || "").localeCompare(b.name || "", 'de'));
+            state.dates.sort((a,b) => {
+                const pA = a.d.split('.'); const pB = b.d.split('.');
                 const valA = pA[2] + pA[1].padStart(2, '0') + pA[0].padStart(2, '0');
                 const valB = pB[2] + pB[1].padStart(2, '0') + pB[0].padStart(2, '0');
                 return valA.localeCompare(valB);
@@ -399,14 +176,14 @@
             const footer = document.getElementById('sumRow');
 
             let headHTML = `<th>Name</th><th class="stat-header">A</th><th class="stat-header">E</th><th class="stat-header">U</th>`;
-            state.specials.forEach((s, i) => {
+            state.specials.forEach((s, i) => { 
                 headHTML += `<th class="special-col">
-                    <div style="font-size:9px; color:#555;">CHECKBOX <span onclick="removeSpecialCol(${i})" style="color:red; cursor:pointer; font-weight:bold; margin-left:5px;">✕</span></div>
-                    <textarea class="special-title-input" onchange="editSpec(${i}, this.value)">${s}</textarea>
-                </th>`;
+                    <div style="font-size:9px; color:#555;">LISTE <span onclick="removeSpecialCol(${i})" style="color:red; cursor:pointer; font-weight:bold; margin-left:5px;">✕</span></div>
+                    <textarea class="special-title-input" onchange="editSpec(${i}, this.value)" lang="de">${s}</textarea>
+                </th>`; 
             });
-            state.dates.forEach((d, i) => {
-                headHTML += `<th class="date-col"><input type="text" value="${d.d}" onchange="editDate(${i}, 'd', this.value)" class="header-input"><br><input type="text" value="${d.t || ''}" placeholder="Thema..." onchange="editDate(${i}, 't', this.value)" class="header-input" style="font-weight:normal; margin-top:3px;"><span class="date-delete" onclick="removeDate(${i})">🗑️</span></th>`;
+            state.dates.forEach((d, i) => { 
+                headHTML += `<th class="date-col"><input type="text" value="${d.d}" onchange="editDate(${i}, 'd', this.value)" class="header-input"><br><input type="text" value="${d.t || ''}" placeholder="Thema..." onchange="editDate(${i}, 't', this.value)" class="header-input" style="font-weight:normal; margin-top:3px;"><span class="date-delete" onclick="removeDate(${i})">🗑️</span></th>`; 
             });
             headHTML += `<th style="width:45px; background:#f0f0f0;">🗑️</th>`;
             header.innerHTML = headHTML;
@@ -420,31 +197,27 @@
                 const sA = m.attendance.filter(a => a === 'A').length;
                 const sE = m.attendance.filter(a => a === 'E').length;
                 const sU = m.attendance.filter(a => a === 'U').length;
-
+                
                 let rowHTML = `<tr>
                     <td><input type="text" class="name-edit-input" value="${m.name}" onchange="editMemberName(${gIdx}, this.value)"></td>
                     <td class="stat-col">${sA}</td><td class="stat-col">${sE}</td><td class="stat-col">${sU}</td>`;
-
-                state.specials.forEach((_, sIdx) => {
-                    rowHTML += `<td><input type="checkbox" style="transform: scale(1.2);" ${m.specialStates[sIdx] ? 'checked' : ''} onchange="updateSpec(${gIdx}, ${sIdx}, this.checked)"></td>`;
+                
+                state.specials.forEach((_, sIdx) => { 
+                    rowHTML += `<td><input type="checkbox" style="transform: scale(1.2);" ${m.specialStates[sIdx] ? 'checked' : ''} onchange="updateSpec(${gIdx}, ${sIdx}, this.checked)"></td>`; 
                 });
-
+                
                 state.dates.forEach((_, dIdx) => {
                     const val = m.attendance[dIdx] || '-';
-                    if (val === 'A') dateSums[dIdx]++;
+                    if(val === 'A') dateSums[dIdx]++;
                     rowHTML += `<td class="status-${val}"><select onchange="updateAtt(${gIdx}, ${dIdx}, this.value)"><option value="-" ${val==='-'?'selected':''}>-</option><option value="A" ${val==='A'?'selected':''}>A</option><option value="E" ${val==='E'?'selected':''}>E</option><option value="U" ${val==='U'?'selected':''}>U</option></select></td>`;
                 });
                 rowHTML += `<td><span class="row-delete-btn" onclick="deleteMember(${gIdx})">🗑️</span></td></tr>`;
                 body.innerHTML += rowHTML;
             });
-
+            
             let footHTML = `<td style="background:#eee;">Summe (A)</td><td style="background:#eee;"></td><td style="background:#eee;"></td><td style="background:#eee;"></td>`;
-            state.specials.forEach(() => {
-                footHTML += `<td style="background:#eee;"></td>`;
-            });
-            dateSums.forEach(s => {
-                footHTML += `<td style="background:#eee; font-weight:bold;">${s}</td>`;
-            });
+            state.specials.forEach(() => { footHTML += `<td style="background:#eee;"></td>`; });
+            dateSums.forEach(s => { footHTML += `<td style="background:#eee; font-weight:bold;">${s}</td>`; });
             footHTML += `<td style="background:#eee;"></td>`;
             footer.innerHTML = footHTML;
 
@@ -452,162 +225,62 @@
         }
 
         function rebuildCalendar(ask = true) {
-            if (ask && !confirm("Kalender neu generieren? Bestehende Anwesenheiten werden gelöscht!")) return;
+            if(ask && !confirm("Kalender neu generieren? Bestehende Anwesenheiten werden gelöscht!")) return;
             const ferienRaw = document.getElementById('ferienInput').value;
             state.ferienRaw = ferienRaw;
             const ranges = ferienRaw.split('\n').filter(l => l.includes(' bis ')).map(l => l.split(' bis '));
             state.dates = [];
             let d = new Date(2026, 0, 1);
-            while (d.getDay() !== 2) d.setDate(d.getDate() + 1);
-            while (d.getFullYear() === 2026) {
+            while(d.getDay() !== 2) d.setDate(d.getDate()+1); 
+            while(d.getFullYear() === 2026) {
                 const y = d.getFullYear();
                 const mo = String(d.getMonth() + 1).padStart(2, '0');
                 const da = String(d.getDate()).padStart(2, '0');
                 const iso = `${y}-${mo}-${da}`;
-                if (!ranges.some(f => iso >= f[0].trim() && iso <= f[1].trim())) {
-                    state.dates.push({
-                        d: `${da}.${mo}.${y}`,
-                        t: ""
-                    });
+                if(!ranges.some(f => iso >= f[0].trim() && iso <= f[1].trim())) {
+                    state.dates.push({ d: `${da}.${mo}.${y}`, t: "" });
                 }
                 d.setDate(d.getDate() + 7);
             }
             state.members.forEach(m => m.attendance = new Array(state.dates.length).fill('-'));
-            render();
-            if (ask) toggleConfig();
+            render(); if(ask) toggleConfig();
         }
 
         function addMember() {
             const inp = document.getElementById('nameInput');
-            if (!inp.value.trim()) return;
-            state.members.push({
-                name: inp.value.trim(),
-                category: state.currentTab,
-                attendance: new Array(state.dates.length).fill('-'),
-                specialStates: new Array(state.specials.length).fill(false)
-            });
-            inp.value = '';
-            render();
+            if(!inp.value.trim()) return;
+            state.members.push({ name: inp.value.trim(), category: state.currentTab, attendance: new Array(state.dates.length).fill('-'), specialStates: new Array(state.specials.length).fill(false) });
+            inp.value = ''; render();
         }
 
-        function editMemberName(idx, newName) {
-            if (newName.trim()) state.members[idx].name = newName.trim();
-            render();
-        }
-
-        function updateAtt(mI, dI, v) {
-            state.members[mI].attendance[dI] = v;
-            render();
-        }
-
-        function updateSpec(mI, sI, v) {
-            state.members[mI].specialStates[sI] = v;
-            render();
-        }
-
-        function editDate(i, f, v) {
-            state.dates[i][f] = v;
-            render();
-        }
-
-        function editSpec(i, v) {
-            state.specials[i] = v;
-            render();
-        }
-
-        function removeDate(i) {
-            if (confirm("Terminspalte löschen?")) {
-                state.dates.splice(i, 1);
-                state.members.forEach(m => m.attendance.splice(i, 1));
-                render();
-            }
-        }
-
-        function removeSpecialCol(i) {
-            if (confirm("Listenspalte löschen?")) {
-                state.specials.splice(i, 1);
-                state.members.forEach(m => m.specialStates.splice(i, 1));
-                render();
-            }
-        }
-
-        function deleteMember(i) {
-            if (confirm("Mitglied löschen?")) {
-                state.members.splice(i, 1);
-                render();
-            }
-        }
-
-        function addManualDate() {
-            const d = prompt("Datum (TT.MM.JJJJ):");
-            if (d) {
-                state.dates.push({
-                    d,
-                    t: ""
-                });
-                state.members.forEach(m => m.attendance.push('-'));
-                render();
-            }
-        }
-
-        function addSpecialColumn() {
-            const t = prompt("Name der Liste:");
-            if (t) {
-                state.specials.push(t);
-                state.members.forEach(m => {
-                    if (!m.specialStates) m.specialStates = [];
-                    m.specialStates.push(false);
-                });
-                render();
-            }
-        }
-
-        function toggleConfig() {
-            const s = document.getElementById('configSection');
-            s.style.display = s.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function createBackup() {
-            const code = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
-            navigator.clipboard.writeText(code).then(() => alert("Sicherungscode kopiert!"));
-        }
-
-        function importBackup() {
-            const code = prompt("Code einfügen:");
-            if (code) {
-                try {
-                    state = JSON.parse(decodeURIComponent(escape(atob(code))));
-                    render();
-                    alert("Erfolg!");
-                } catch (e) {
-                    alert("Fehler!");
-                }
-            }
-        }
-
-        function resetAll() {
-            if (confirm("ALLES LÖSCHEN?")) {
-                localStorage.removeItem(STORAGE_KEY);
-                location.reload();
-            }
-        }
-
+        function editMemberName(idx, newName) { if(newName.trim()) state.members[idx].name = newName.trim(); render(); }
+        function updateAtt(mI, dI, v) { state.members[mI].attendance[dI] = v; render(); }
+        function updateSpec(mI, sI, v) { state.members[mI].specialStates[sI] = v; render(); }
+        function editDate(i, f, v) { state.dates[i][f] = v; render(); }
+        function editSpec(i, v) { state.specials[i] = v; render(); }
+        function removeDate(i) { if(confirm("Terminspalte löschen?")) { state.dates.splice(i,1); state.members.forEach(m => m.attendance.splice(i,1)); render(); } }
+        function removeSpecialCol(i) { if(confirm("Listenspalte löschen?")) { state.specials.splice(i,1); state.members.forEach(m => m.specialStates.splice(i,1)); render(); } }
+        function deleteMember(i) { if(confirm("Mitglied löschen?")) { state.members.splice(i,1); render(); } }
+        function addManualDate() { const d = prompt("Datum (TT.MM.JJJJ):"); if(d) { state.dates.push({d, t:""}); state.members.forEach(m => m.attendance.push('-')); render(); } }
+        function addSpecialColumn() { const t = prompt("Name der Liste:"); if(t) { state.specials.push(t); state.members.forEach(m => { if(!m.specialStates) m.specialStates = []; m.specialStates.push(false); }); render(); } }
+        function toggleConfig() { const s = document.getElementById('configSection'); s.style.display = s.style.display === 'block' ? 'none' : 'block'; }
+        function createBackup() { const code = btoa(unescape(encodeURIComponent(JSON.stringify(state)))); navigator.clipboard.writeText(code).then(() => alert("Sicherungscode kopiert!")); }
+        function importBackup() { const code = prompt("Code einfügen:"); if(code) { try { state = JSON.parse(decodeURIComponent(escape(atob(code)))); render(); alert("Erfolg!"); } catch(e) { alert("Fehler!"); } } }
+        function resetAll() { if(confirm("ALLES LÖSCHEN?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
+        
         function exportCSV() {
-            let csv = "Kategorie;Name;A;E;U;" + state.specials.join(";") + ";" + state.dates.map(d => d.d).join(";") + "\r\n";
+            // Hilfsfunktion um Text Excel-sicher zu machen (keine Zeilenumbrüche)
+            const clean = (txt) => txt ? txt.replace(/\r?\n|\r/g, " ").trim() : "";
+
+            let csv = "Kategorie;Name;A;E;U;" + state.specials.map(s => clean(s)).join(";") + ";" + state.dates.map(d => d.d).join(";") + "\r\n";
             state.members.forEach(m => {
-                const s = [m.attendance.filter(a => a === 'A').length, m.attendance.filter(a => a === 'E').length, m.attendance.filter(a => a === 'U').length];
-                csv += `${m.category};${m.name};${s[0]};${s[1]};${s[2]};${m.specialStates.map(v => v?'JA':'NEIN').join(';')};${m.attendance.join(';')}\r\n`;
+                const s = [m.attendance.filter(a=>a==='A').length, m.attendance.filter(a=>a==='E').length, m.attendance.filter(a=>a==='U').length];
+                csv += `${m.category};${clean(m.name)};${s[0]};${s[1]};${s[2]};${m.specialStates.map(v => v?'JA':'NEIN').join(';')};${m.attendance.join(';')}\r\n`;
             });
-            const blob = new Blob(["\uFEFF" + csv], {
-                type: 'text/csv;charset=utf-8;'
-            });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `JF_Ehingen_2026.csv`;
-            link.click();
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `JF_Ehingen_2026.csv`; link.click();
         }
         window.onload = init;
     </script>
 </body>
-
 </html>
