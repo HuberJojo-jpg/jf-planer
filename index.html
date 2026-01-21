@@ -22,26 +22,33 @@
         .btn-orange { background: #fd7e14; }
         .btn-purple { background: #6f42c1; }
         .config-section { background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: none; border: 2px solid #eee; width: 100%; box-sizing: border-box; }
-        .tab-container { display: flex; gap: 5px; margin-bottom: -1px; }
-        .tab { padding: 12px 25px; background: #e0e0e0; border-radius: 10px 10px 0 0; cursor: pointer; font-weight: bold; color: #666; border: 1px solid #ccc; border-bottom: none; }
+        .tab-container { display: flex; gap: 4px; margin-bottom: -1px; }
+        .tab { padding: 12px 20px; background: #ddd; border-radius: 10px 10px 0 0; cursor: pointer; font-weight: bold; color: #555; border: 1px solid #ccc; border-bottom: none; font-size: 14px; }
         .tab.active { background: white; color: var(--fire-red); border-bottom: 3px solid white; z-index: 5; border-top: 3px solid var(--fire-red); }
         .table-container { background: white; padding: 10px; border-radius: 0 12px 12px 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); overflow-x: auto; border-top: 1px solid #ccc; min-height: 200px; }
         table { border-collapse: collapse; min-width: 100%; }
         th, td { border: 1px solid #eee; padding: 10px 6px; text-align: center; }
         th { background: #444; color: white; font-size: 11px; vertical-align: top; }
-        td:first-child, th:first-child { position: sticky; left: 0; z-index: 30; background: white; min-width: 150px; text-align: left; font-weight: bold; border-right: 3px solid #ddd; }
+        
+        /* Sticky Name Column */
+        td:first-child, th:first-child { position: sticky; left: 0; z-index: 30; background: white; min-width: 160px; text-align: left; font-weight: bold; border-right: 3px solid #ddd; }
         th:first-child { background: #222; }
+        
+        .name-edit-input { border: none; background: transparent; font-family: inherit; font-size: 14px; font-weight: bold; width: 120px; color: inherit; padding: 4px; border-radius: 4px; }
+        .name-edit-input:focus { background: #fff; outline: 1px solid #ccc; }
+
         th.special-col { background: var(--jf-blue); min-width: 100px; }
-        .special-title-input { background: transparent; border: none; color: white; font-size: 11px; text-align: center; width: 100%; resize: none; }
+        .special-title-input { background: transparent; border: none; color: white; font-size: 11px; text-align: center; width: 100%; resize: none; line-height: 1.2; }
         .header-input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; text-align: center; font-size: 11px; padding: 5px; width: 85px; border-radius: 4px; }
         .stat-col { background: #f9f9f9; font-weight: 800; color: #444; min-width: 35px; }
         .status-A { background-color: #d4edda !important; }
         .status-E { background-color: #fff3cd !important; }
         .status-U { background-color: #f8d7da !important; }
         select { border: none; background: transparent; width: 100%; font-weight: bold; cursor: pointer; text-align-last: center; }
-        .delete-btn { color: #bbb; margin-left: 8px; cursor: pointer; }
+        .delete-btn { color: #bbb; margin-left: 5px; cursor: pointer; font-size: 14px; padding: 2px 5px; }
+        .delete-btn:hover { color: var(--fire-red); }
         .date-delete { color: #ff8888; cursor: pointer; display: block; margin-top: 8px; font-size: 16px; }
-        @media (max-width: 768px) { td:first-child, th:first-child { min-width: 110px; } }
+        @media (max-width: 768px) { td:first-child, th:first-child { min-width: 130px; } }
     </style>
 </head>
 <body>
@@ -57,19 +64,19 @@
     </div>
 
     <div id="configSection" class="config-section">
-        <h3>Dienstplan & Ferien-Konfiguration</h3>
+        <h3>Konfiguration & Backup</h3>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
             <div>
-                <label>Ferien-Zeiträume (JJJJ-MM-TT bis JJJJ-MM-TT):</label><br>
-                <textarea id="ferienInput" style="width:100%; height:120px; margin-top:10px; font-family:monospace; font-size:12px;">2025-12-22 bis 2026-01-06
+                <label>Ferien BW 2026 (JJJJ-MM-TT bis JJJJ-MM-TT):</label><br>
+                <textarea id="ferienInput" style="width:100%; height:100px; margin-top:10px; font-family:monospace; font-size:12px;">2025-12-22 bis 2026-01-06
 2026-03-30 bis 2026-04-10
 2026-05-26 bis 2026-06-05
 2026-07-30 bis 2026-09-11
 2026-10-26 bis 2026-10-30</textarea><br>
-                <button class="btn-red" onclick="rebuildCalendar()" style="margin-top:10px;">Kalender mit diesen Ferien generieren</button>
+                <button class="btn-red" onclick="rebuildCalendar()" style="margin-top:10px;">Kalender neu generieren</button>
             </div>
             <div>
-                <strong>Daten-Backup:</strong><br>
+                <strong>Backup:</strong><br>
                 <button class="btn-purple" onclick="createBackup()" style="margin-top:5px; width:100%;">Code kopieren</button>
                 <button class="btn-blue" onclick="importBackup()" style="margin-top:5px; width:100%;">Code einspielen</button>
                 <button class="btn-red" onclick="resetAll()" style="margin-top:20px; width:100%;">⚠️ Komplett-Reset</button>
@@ -93,7 +100,7 @@
 
     <script>
         let state = { year: 2026, dates: [], specials: [], members: [], currentTab: 'Kleine', ferienRaw: "" };
-        const STORAGE_KEY = 'jf_ehingen_2026_vFinal_Fixed';
+        const STORAGE_KEY = 'jf_ehingen_2026_vFinal_Editable';
 
         function init() {
             const saved = localStorage.getItem(STORAGE_KEY);
@@ -116,9 +123,7 @@
             state.members.sort((a,b) => a.name.localeCompare(b.name, 'de'));
             state.dates.sort((a,b) => {
                 const pA = a.d.split('.'); const pB = b.d.split('.');
-                const dateA = new Date(pA[2], pA[1]-1, pA[0]);
-                const dateB = new Date(pB[2], pB[1]-1, pB[0]);
-                return dateA - dateB;
+                return (pA[2]+pA[1]+pA[0]).localeCompare(pB[2]+pB[1]+pB[0]);
             });
         }
 
@@ -130,7 +135,7 @@
 
             header.innerHTML = `<th>Name</th><th>A</th><th>E</th><th>U</th>`;
             state.specials.forEach((s, i) => { header.innerHTML += `<th class="special-col"><span class="delete-btn" onclick="removeSpecialCol(${i})">✕</span><textarea class="special-title-input" onchange="editSpec(${i}, this.value)">${s}</textarea></th>`; });
-            state.dates.forEach((d, i) => { header.innerHTML += `<th><input type="text" value="${d.d}" onchange="editDate(${i}, 'd', this.value)" class="header-input" style="font-weight:bold;"><br><input type="text" value="${d.t}" placeholder="Thema..." onchange="editDate(${i}, 't', this.value)" class="header-input"><span class="date-delete" onclick="removeDate(${i})">🗑️</span></th>`; });
+            state.dates.forEach((d, i) => { header.innerHTML += `<th><input type="text" value="${d.d}" onchange="editDate(${i}, 'd', this.value)" class="header-input" style="font-weight:bold;"><br><input type="text" value="${d.t}" placeholder="..." onchange="editDate(${i}, 't', this.value)" class="header-input"><span class="date-delete" onclick="removeDate(${i})">🗑️</span></th>`; });
 
             body.innerHTML = '';
             let dateSums = new Array(state.dates.length).fill(0);
@@ -141,7 +146,14 @@
                 const sA = m.attendance.filter(a => a === 'A').length;
                 const sE = m.attendance.filter(a => a === 'E').length;
                 const sU = m.attendance.filter(a => a === 'U').length;
-                let row = `<tr><td>${m.name} <span class="delete-btn" onclick="deleteMember(${gIdx})">✕</span></td><td class="stat-col">${sA}</td><td class="stat-col">${sE}</td><td class="stat-col">${sU}</td>`;
+                
+                let row = `<tr>
+                    <td>
+                        <input type="text" class="name-edit-input" value="${m.name}" onchange="editMemberName(${gIdx}, this.value)">
+                        <span class="delete-btn" onclick="deleteMember(${gIdx})">✕</span>
+                    </td>
+                    <td class="stat-col">${sA}</td><td class="stat-col">${sE}</td><td class="stat-col">${sU}</td>`;
+                
                 state.specials.forEach((_, sIdx) => { row += `<td><input type="checkbox" ${m.specialStates[sIdx] ? 'checked' : ''} onchange="updateSpec(${gIdx}, ${sIdx}, this.checked)"></td>`; });
                 state.dates.forEach((_, dIdx) => {
                     const val = m.attendance[dIdx] || '-';
@@ -151,27 +163,28 @@
                 body.innerHTML += row + '</tr>';
             });
             
-            if (filteredMembers.length === 0) {
-                body.innerHTML = `<tr><td colspan="${4 + state.specials.length + state.dates.length}" style="padding:40px; color:#999;">Keine Mitglieder in dieser Kategorie. Füge oben jemanden hinzu!</td></tr>`;
-            }
-
             footer.innerHTML = `<td>Summe (A)</td><td></td><td></td><td></td>` + state.specials.map(() => '<td></td>').join('') + dateSums.map(s => `<td>${s}</td>`).join('');
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
 
+        function editMemberName(idx, newName) {
+            if(newName.trim() === "") return;
+            state.members[idx].name = newName.trim();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            // Wir rendern hier nicht sofort neu, um den Fokus beim Tippen nicht zu verlieren, 
+            // erst beim nächsten Tab-Wechsel oder Refresh wird sortiert.
+        }
+
         function rebuildCalendar(ask = true) {
-            if(ask && !confirm("Kalender neu generieren? Bestehende Anwesenheiten werden gelöscht!")) return;
-            const ferienRaw = document.getElementById('ferienInput').value;
-            state.ferienRaw = ferienRaw;
-            const ferienRanges = ferienRaw.split('\n').filter(l => l.includes(' bis ')).map(l => l.split(' bis '));
-            
+            if(ask && !confirm("Bestehende Anwesenheiten werden gelöscht! Fortfahren?")) return;
+            state.ferienRaw = document.getElementById('ferienInput').value;
+            const ranges = state.ferienRaw.split('\n').filter(l => l.includes(' bis ')).map(l => l.split(' bis '));
             state.dates = [];
             let d = new Date(2026, 0, 1);
             while(d.getDay() !== 2) d.setDate(d.getDate()+1); 
             while(d.getFullYear() === 2026) {
                 const iso = d.toISOString().split('T')[0];
-                const isFrei = ferienRanges.some(f => iso >= f[0].trim() && iso <= f[1].trim());
-                if(!isFrei) {
+                if(!ranges.some(f => iso >= f[0].trim() && iso <= f[1].trim())) {
                     state.dates.push({ d: d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'}), t: "" });
                 }
                 d.setDate(d.getDate()+7);
@@ -200,17 +213,14 @@
         function resetAll() { if(confirm("ALLES LÖSCHEN?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
         function createBackup() { const code = btoa(unescape(encodeURIComponent(JSON.stringify(state)))); navigator.clipboard.writeText(code).then(() => alert("Sicherungscode kopiert!")); }
         function importBackup() { const code = prompt("Code einfügen:"); if(code) { try { state = JSON.parse(decodeURIComponent(escape(atob(code)))); render(); alert("Erfolg!"); } catch(e) { alert("Fehler!"); } } }
-        
         function exportCSV() {
             let csv = "Kategorie;Name;A;E;U;" + state.specials.join(";") + ";" + state.dates.map(d => d.d).join(";") + "\r\n";
             state.members.forEach(m => {
-                const sA = m.attendance.filter(a => a === 'A').length;
-                const sE = m.attendance.filter(a => a === 'E').length;
-                const sU = m.attendance.filter(a => a === 'U').length;
-                csv += `${m.category};${m.name};${sA};${sE};${sU};${m.specialStates.map(v => v?'JA':'NEIN').join(';')};${m.attendance.join(';')}\r\n`;
+                const s = [m.attendance.filter(a=>a==='A').length, m.attendance.filter(a=>a==='E').length, m.attendance.filter(a=>a==='U').length];
+                csv += `${m.category};${m.name};${s[0]};${s[1]};${s[2]};${m.specialStates.map(v => v?'JA':'NEIN').join(';')};${m.attendance.join(';')}\r\n`;
             });
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `JF_Ehingen_Planer.csv`; link.click();
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `JF_Planer.csv`; link.click();
         }
         window.onload = init;
     </script>
