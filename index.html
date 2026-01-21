@@ -6,15 +6,14 @@
     <title>JF Ehingen Planer 2026</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/491/491410.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
         :root { --fire-red: #e10000; --jf-blue: #0056b3; --dark-gray: #333; --light-gray: #f4f4f4; --active-green: #28a745; }
-        body { font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 15px; background-color: var(--light-gray); color: var(--dark-gray); }
+        body { font-family: -apple-system, system-ui, sans-serif; margin: 15px; background-color: var(--light-gray); }
         .controls { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
         .controls h2 { font-size: 1.4rem; color: var(--fire-red); margin: 0 0 10px 0; width: 100%; text-align: left; border-bottom: 2px solid var(--light-gray); padding-bottom: 10px; }
-        input[type="text"], input[type="number"], textarea { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; background: #fff; }
-        #nameInput { flex-grow: 2; min-width: 200px; border: 2px solid #ddd; }
-        button { padding: 12px 16px; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; font-size: 14px; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 5px; }
+        input[type="text"], textarea { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
+        #nameInput { flex-grow: 2; }
+        button { padding: 12px 16px; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; font-size: 14px; }
         .btn-green { background: var(--active-green); }
         .btn-blue { background: #007bff; }
         .btn-yellow { background: #ffc107; color: black; }
@@ -24,32 +23,25 @@
         .btn-purple { background: #6f42c1; }
         .config-section { background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: none; border: 2px solid #eee; width: 100%; box-sizing: border-box; }
         .tab-container { display: flex; gap: 5px; margin-bottom: -1px; }
-        .tab { padding: 12px 25px; background: #e0e0e0; border-radius: 10px 10px 0 0; cursor: pointer; font-weight: bold; color: #666; border: 1px solid #ccc; border-bottom: none; transition: 0.3s; }
-        .tab-kleine.active { background: white; color: var(--fire-red); border-bottom: 3px solid white; border-top: 3px solid var(--fire-red); z-index: 5; }
-        .tab-grosse.active { background: white; color: var(--jf-blue); border-bottom: 3px solid white; border-top: 3px solid var(--jf-blue); z-index: 5; }
-        .tab-betreuer.active { background: white; color: #333; border-bottom: 3px solid white; border-top: 3px solid #333; z-index: 5; }
-        .table-container { background: white; padding: 10px; border-radius: 0 12px 12px 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); overflow-x: auto; border-top: 1px solid #ccc; }
+        .tab { padding: 12px 25px; background: #e0e0e0; border-radius: 10px 10px 0 0; cursor: pointer; font-weight: bold; color: #666; border: 1px solid #ccc; border-bottom: none; }
+        .tab.active { background: white; color: var(--fire-red); border-bottom: 3px solid white; z-index: 5; border-top: 3px solid var(--fire-red); }
+        .table-container { background: white; padding: 10px; border-radius: 0 12px 12px 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); overflow-x: auto; border-top: 1px solid #ccc; min-height: 200px; }
         table { border-collapse: collapse; min-width: 100%; }
         th, td { border: 1px solid #eee; padding: 10px 6px; text-align: center; }
-        th { background: #444; color: white; font-size: 12px; vertical-align: top; }
-        td:first-child, th:first-child { position: sticky; left: 0; z-index: 30; background: white; min-width: 160px; text-align: left; font-weight: bold; border-right: 3px solid #ddd; }
-        th:first-child { background: #222; z-index: 31; }
+        th { background: #444; color: white; font-size: 11px; vertical-align: top; }
+        td:first-child, th:first-child { position: sticky; left: 0; z-index: 30; background: white; min-width: 150px; text-align: left; font-weight: bold; border-right: 3px solid #ddd; }
+        th:first-child { background: #222; }
         th.special-col { background: var(--jf-blue); min-width: 100px; }
-        .special-title-input { background: transparent; border: none; color: white; font-size: 11px; text-align: center; width: 100%; resize: none; line-height: 1.3; padding: 0; }
+        .special-title-input { background: transparent; border: none; color: white; font-size: 11px; text-align: center; width: 100%; resize: none; }
         .header-input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; text-align: center; font-size: 11px; padding: 5px; width: 85px; border-radius: 4px; }
-        .stat-col { background: #f9f9f9; font-weight: 800; color: #444; min-width: 40px; }
-        .status-A { background-color: #d4edda !important; color: #155724; }
-        .status-E { background-color: #fff3cd !important; color: #856404; }
-        .status-U { background-color: #f8d7da !important; color: #721c24; }
-        select { border: none; background: transparent; width: 100%; height: 30px; font-size: 14px; font-weight: bold; cursor: pointer; text-align-last: center; }
-        .delete-btn { color: #bbb; margin-left: 8px; cursor: pointer; font-size: 12px; }
+        .stat-col { background: #f9f9f9; font-weight: 800; color: #444; min-width: 35px; }
+        .status-A { background-color: #d4edda !important; }
+        .status-E { background-color: #fff3cd !important; }
+        .status-U { background-color: #f8d7da !important; }
+        select { border: none; background: transparent; width: 100%; font-weight: bold; cursor: pointer; text-align-last: center; }
+        .delete-btn { color: #bbb; margin-left: 8px; cursor: pointer; }
         .date-delete { color: #ff8888; cursor: pointer; display: block; margin-top: 8px; font-size: 16px; }
-        @media (max-width: 768px) {
-            .controls { padding: 15px; }
-            #nameInput { width: 100%; }
-            button { flex: 1; justify-content: center; }
-            td:first-child, th:first-child { min-width: 120px; font-size: 12px; }
-        }
+        @media (max-width: 768px) { td:first-child, th:first-child { min-width: 110px; } }
     </style>
 </head>
 <body>
@@ -61,28 +53,34 @@
         <button class="btn-orange" onclick="addSpecialColumn()">☑️ Liste</button>
         <button class="btn-yellow" onclick="addManualDate()">📅 Termin +</button>
         <button class="btn-blue" onclick="exportCSV()">💾 Export</button>
-        <button class="btn-gray" onclick="toggleConfig()">⚙️ Backup</button>
+        <button class="btn-gray" onclick="toggleConfig()">⚙️ Setup</button>
     </div>
 
     <div id="configSection" class="config-section">
-        <h3>Datensicherung & Reset</h3>
+        <h3>Dienstplan & Ferien-Konfiguration</h3>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
             <div>
-                <button class="btn-red" onclick="rebuildCalendar()">Kalender 2026 BW neu erstellen</button>
-                <p style="font-size: 11px; color: #777; margin-top: 10px;">Achtung: Löscht alle eingetragenen Anwesenheiten!</p>
+                <label>Ferien-Zeiträume (JJJJ-MM-TT bis JJJJ-MM-TT):</label><br>
+                <textarea id="ferienInput" style="width:100%; height:120px; margin-top:10px; font-family:monospace; font-size:12px;">2025-12-22 bis 2026-01-06
+2026-03-30 bis 2026-04-10
+2026-05-26 bis 2026-06-05
+2026-07-30 bis 2026-09-11
+2026-10-26 bis 2026-10-30</textarea><br>
+                <button class="btn-red" onclick="rebuildCalendar()" style="margin-top:10px;">Kalender mit diesen Ferien generieren</button>
             </div>
             <div>
-                <strong>Umzug:</strong><br>
-                <button class="btn-purple" onclick="createBackup()">Code kopieren</button>
-                <button class="btn-blue" onclick="importBackup()" style="margin-top:5px;">Code einspielen</button>
+                <strong>Daten-Backup:</strong><br>
+                <button class="btn-purple" onclick="createBackup()" style="margin-top:5px; width:100%;">Code kopieren</button>
+                <button class="btn-blue" onclick="importBackup()" style="margin-top:5px; width:100%;">Code einspielen</button>
+                <button class="btn-red" onclick="resetAll()" style="margin-top:20px; width:100%;">⚠️ Komplett-Reset</button>
             </div>
         </div>
     </div>
 
     <div class="tab-container">
-        <div class="tab tab-kleine active" onclick="switchTab('Kleine')">Kleine</div>
-        <div class="tab tab-grosse" onclick="switchTab('Große')">Große</div>
-        <div class="tab tab-betreuer" onclick="switchTab('Betreuer')">Betreuer</div>
+        <div class="tab active" onclick="switchTab('Kleine')">Kleine</div>
+        <div class="tab" onclick="switchTab('Große')">Große</div>
+        <div class="tab" onclick="switchTab('Betreuer')">Betreuer</div>
     </div>
 
     <div class="table-container">
@@ -94,35 +92,33 @@
     </div>
 
     <script>
-        const ferienBW2026 = [['2025-12-22', '2026-01-06'],['2026-03-30', '2026-04-10'],['2026-05-26', '2026-06-05'],['2026-07-30', '2026-09-11'],['2026-10-26', '2026-10-30'],['2026-12-23', '2026-12-31']];
-        let state = { year: 2026, dates: [], specials: [], members: [], currentTab: 'Kleine' };
-        const STORAGE_KEY = 'jf_ehingen_2026_final_fix';
+        let state = { year: 2026, dates: [], specials: [], members: [], currentTab: 'Kleine', ferienRaw: "" };
+        const STORAGE_KEY = 'jf_ehingen_2026_vFinal_Fixed';
 
         function init() {
             const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) { state = JSON.parse(saved); }
-            else { rebuildCalendar(false); }
+            if (saved) { 
+                state = JSON.parse(saved);
+                document.getElementById('ferienInput').value = state.ferienRaw || document.getElementById('ferienInput').value;
+            } else { 
+                rebuildCalendar(false); 
+            }
             switchTab(state.currentTab);
         }
 
         function switchTab(tab) {
             state.currentTab = tab;
-            document.querySelectorAll('.tab').forEach(t => {
-                t.classList.toggle('active', t.innerText === tab);
-            });
+            document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.innerText === tab));
             render();
         }
 
-        // --- STABILE SORTIERUNG FÜR ALLE BROWSER ---
         function sortData() {
             state.members.sort((a,b) => a.name.localeCompare(b.name, 'de'));
             state.dates.sort((a,b) => {
-                const pA = a.d.split('.');
-                const pB = b.d.split('.');
-                // Erstellt ein vergleichbares Datum (JJJJMMTT)
-                const valA = pA[2] + pA[1].padStart(2, '0') + pA[0].padStart(2, '0');
-                const valB = pB[2] + pB[1].padStart(2, '0') + pB[0].padStart(2, '0');
-                return valA.localeCompare(valB);
+                const pA = a.d.split('.'); const pB = b.d.split('.');
+                const dateA = new Date(pA[2], pA[1]-1, pA[0]);
+                const dateB = new Date(pB[2], pB[1]-1, pB[0]);
+                return dateA - dateB;
             });
         }
 
@@ -132,25 +128,21 @@
             const body = document.getElementById('memberBody');
             const footer = document.getElementById('sumRow');
 
-            header.innerHTML = `<th>Name</th><th title="Anwesend">A</th><th title="Entschuldigt">E</th><th title="Unentschuldigt">U</th>`;
-            state.specials.forEach((s, i) => {
-                header.innerHTML += `<th class="special-col"><span class="delete-btn" onclick="removeSpecialCol(${i})">✕</span><textarea class="special-title-input" onchange="editSpec(${i}, this.value)">${s}</textarea></th>`;
-            });
-            state.dates.forEach((d, i) => {
-                header.innerHTML += `<th><input type="text" value="${d.d}" onchange="editDate(${i}, 'd', this.value)" class="header-input" style="font-weight:bold;"><br><input type="text" value="${d.t}" placeholder="Thema..." onchange="editDate(${i}, 't', this.value)" class="header-input"><span class="date-delete" onclick="removeDate(${i})">🗑️</span></th>`;
-            });
+            header.innerHTML = `<th>Name</th><th>A</th><th>E</th><th>U</th>`;
+            state.specials.forEach((s, i) => { header.innerHTML += `<th class="special-col"><span class="delete-btn" onclick="removeSpecialCol(${i})">✕</span><textarea class="special-title-input" onchange="editSpec(${i}, this.value)">${s}</textarea></th>`; });
+            state.dates.forEach((d, i) => { header.innerHTML += `<th><input type="text" value="${d.d}" onchange="editDate(${i}, 'd', this.value)" class="header-input" style="font-weight:bold;"><br><input type="text" value="${d.t}" placeholder="Thema..." onchange="editDate(${i}, 't', this.value)" class="header-input"><span class="date-delete" onclick="removeDate(${i})">🗑️</span></th>`; });
 
             body.innerHTML = '';
             let dateSums = new Array(state.dates.length).fill(0);
-            state.members.filter(m => m.category === state.currentTab).forEach((m) => {
-                const gIdx = state.members.indexOf(m);
-                const stats = { A: 0, E: 0, U: 0 };
-                m.attendance.forEach(val => { if(stats[val] !== undefined) stats[val]++; });
+            const filteredMembers = state.members.filter(m => m.category === state.currentTab);
 
-                let row = `<tr><td>${m.name} <span class="delete-btn" onclick="deleteMember(${gIdx})">✕</span></td><td class="stat-col">${stats.A}</td><td class="stat-col">${stats.E}</td><td class="stat-col">${stats.U}</td>`;
-                state.specials.forEach((_, sIdx) => {
-                    row += `<td><input type="checkbox" ${m.specialStates[sIdx] ? 'checked' : ''} onchange="updateSpec(${gIdx}, ${sIdx}, this.checked)"></td>`;
-                });
+            filteredMembers.forEach((m) => {
+                const gIdx = state.members.indexOf(m);
+                const sA = m.attendance.filter(a => a === 'A').length;
+                const sE = m.attendance.filter(a => a === 'E').length;
+                const sU = m.attendance.filter(a => a === 'U').length;
+                let row = `<tr><td>${m.name} <span class="delete-btn" onclick="deleteMember(${gIdx})">✕</span></td><td class="stat-col">${sA}</td><td class="stat-col">${sE}</td><td class="stat-col">${sU}</td>`;
+                state.specials.forEach((_, sIdx) => { row += `<td><input type="checkbox" ${m.specialStates[sIdx] ? 'checked' : ''} onchange="updateSpec(${gIdx}, ${sIdx}, this.checked)"></td>`; });
                 state.dates.forEach((_, dIdx) => {
                     const val = m.attendance[dIdx] || '-';
                     if(val === 'A') dateSums[dIdx]++;
@@ -158,19 +150,28 @@
                 });
                 body.innerHTML += row + '</tr>';
             });
+            
+            if (filteredMembers.length === 0) {
+                body.innerHTML = `<tr><td colspan="${4 + state.specials.length + state.dates.length}" style="padding:40px; color:#999;">Keine Mitglieder in dieser Kategorie. Füge oben jemanden hinzu!</td></tr>`;
+            }
 
             footer.innerHTML = `<td>Summe (A)</td><td></td><td></td><td></td>` + state.specials.map(() => '<td></td>').join('') + dateSums.map(s => `<td>${s}</td>`).join('');
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
 
         function rebuildCalendar(ask = true) {
-            if(ask && !confirm("Kalender für 2026 neu generieren? Bestehende Anwesenheiten werden gelöscht!")) return;
+            if(ask && !confirm("Kalender neu generieren? Bestehende Anwesenheiten werden gelöscht!")) return;
+            const ferienRaw = document.getElementById('ferienInput').value;
+            state.ferienRaw = ferienRaw;
+            const ferienRanges = ferienRaw.split('\n').filter(l => l.includes(' bis ')).map(l => l.split(' bis '));
+            
             state.dates = [];
             let d = new Date(2026, 0, 1);
             while(d.getDay() !== 2) d.setDate(d.getDate()+1); 
             while(d.getFullYear() === 2026) {
                 const iso = d.toISOString().split('T')[0];
-                if(!ferienBW2026.some(f => iso >= f[0] && iso <= f[1])) {
+                const isFrei = ferienRanges.some(f => iso >= f[0].trim() && iso <= f[1].trim());
+                if(!isFrei) {
                     state.dates.push({ d: d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'}), t: "" });
                 }
                 d.setDate(d.getDate()+7);
@@ -188,24 +189,28 @@
 
         function toggleConfig() { const s = document.getElementById('configSection'); s.style.display = s.style.display === 'block' ? 'none' : 'block'; }
         function addManualDate() { const d = prompt("Datum (TT.MM.JJJJ):"); if(d) { state.dates.push({d, t:""}); state.members.forEach(m => m.attendance.push('-')); render(); } }
-        function addSpecialColumn() { const t = prompt("Name der Liste:"); if(t) { state.specials.push(t); state.members.forEach(m => m.specialStates.push(false)); render(); } }
+        function addSpecialColumn() { const t = prompt("Name der Liste:"); if(t) { state.specials.push(t); state.members.forEach(m => { if(!m.specialStates) m.specialStates = []; m.specialStates.push(false); }); render(); } }
         function editDate(i, f, v) { state.dates[i][f] = v; render(); }
         function editSpec(i, v) { state.specials[i] = v; render(); }
         function updateAtt(mI, dI, v) { state.members[mI].attendance[dI] = v; render(); }
-        function updateSpec(mI, sI, v) { state.members[mI].specialStates[sI] = v; render(); }
+        function updateSpec(mI, sI, v) { state.members[mI].specialStates[sI] = v; localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+        function deleteMember(i) { if(confirm("Löschen?")) { state.members.splice(i,1); render(); } }
         function removeDate(i) { if(confirm("Löschen?")) { state.dates.splice(i,1); state.members.forEach(m => m.attendance.splice(i,1)); render(); } }
         function removeSpecialCol(i) { if(confirm("Löschen?")) { state.specials.splice(i,1); state.members.forEach(m => m.specialStates.splice(i,1)); render(); } }
-        function deleteMember(i) { if(confirm("Löschen?")) { state.members.splice(i,1); render(); } }
+        function resetAll() { if(confirm("ALLES LÖSCHEN?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
         function createBackup() { const code = btoa(unescape(encodeURIComponent(JSON.stringify(state)))); navigator.clipboard.writeText(code).then(() => alert("Sicherungscode kopiert!")); }
         function importBackup() { const code = prompt("Code einfügen:"); if(code) { try { state = JSON.parse(decodeURIComponent(escape(atob(code)))); render(); alert("Erfolg!"); } catch(e) { alert("Fehler!"); } } }
+        
         function exportCSV() {
             let csv = "Kategorie;Name;A;E;U;" + state.specials.join(";") + ";" + state.dates.map(d => d.d).join(";") + "\r\n";
             state.members.forEach(m => {
-                const stats = {A:0,E:0,U:0}; m.attendance.forEach(v=>{if(stats[v]!==undefined)stats[v]++;});
-                csv += `${m.category};${m.name};${stats.A};${stats.E};${stats.U};${m.specialStates.map(v => v?'JA':'NEIN').join(';')};${m.attendance.join(';')}\r\n`;
+                const sA = m.attendance.filter(a => a === 'A').length;
+                const sE = m.attendance.filter(a => a === 'E').length;
+                const sU = m.attendance.filter(a => a === 'U').length;
+                csv += `${m.category};${m.name};${sA};${sE};${sU};${m.specialStates.map(v => v?'JA':'NEIN').join(';')};${m.attendance.join(';')}\r\n`;
             });
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `JF_Ehingen_2026.csv`; link.click();
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `JF_Ehingen_Planer.csv`; link.click();
         }
         window.onload = init;
     </script>
