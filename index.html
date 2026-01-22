@@ -263,16 +263,20 @@
         .header-input {
             text-align: center;
             width: 100%;
-            max-width: 120px;
-            /* Begrenzt die Breite auf Tablet-Maß */
+            max-width: 115px;
+            /* Etwas schmaler für iPad Chrome */
             border: 1px solid #bbb;
             border-radius: 4px;
             font-weight: bold;
             font-size: 11px;
-            height: 26px;
+            height: 24px;
             background: white;
             box-sizing: border-box;
-            /* Verhindert, dass Padding das Feld vergrößert */
+            padding: 0;
+            margin: 0 auto;
+            display: block;
+            min-width: 0;
+            /* Wichtig für Chrome auf iOS */
         }
         
         body.dark-mode .header-input {
@@ -347,6 +351,22 @@
         
         body.dark-mode .status-U {
             background-color: #3d1a1a !important;
+        }
+        
+        .inv-date-input {
+            width: 100%;
+            max-width: 110px;
+            font-size: 11px;
+            height: 26px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            display: block;
+            margin: 0 auto;
+            padding: 0;
+            /* Speziell für Chrome/Safari auf iPad */
+            line-height: 26px;
+            background-color: #fff;
         }
         
         .inv-item-input {
@@ -467,12 +487,15 @@
         </section>
 
         <section id="inventar" class="view-section">
-            <div class="controls">
-                <h2>Inventar & Verleih</h2>
-                <input type="text" id="itemInput" placeholder="Gegenstand..." style="flex-grow:1" onkeypress="if(event.key === 'Enter') addInventoryItem()">
-                <button class="btn-green" onclick="addInventoryItem()">➕</button>
-                <button class="btn-blue" onclick="exportInventoryCSV()">💾 Export</button>
-            </div>
+            <thead>
+                <tr>
+                    <th style="width:180px">Gegenstand</th>
+                    <th style="width:45px">Anz.</th>
+                    <th style="width:115px; text-align: center;">Verliehen am</th>
+                    <th>Kommentare</th>
+                    <th style="width:40px">🗑️</th>
+                </tr>
+            </thead>
 
             <div class="search-container">
                 <span class="search-icon">🔍</span>
