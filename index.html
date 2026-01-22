@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JF Ehingen Planer & Inventar</title>
+    <title>JF Ehingen Verwaltung</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/491/491410.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <style>
@@ -263,13 +263,16 @@
         .header-input {
             text-align: center;
             width: 100%;
+            max-width: 120px;
+            /* Begrenzt die Breite auf Tablet-Maß */
             border: 1px solid #bbb;
             border-radius: 4px;
             font-weight: bold;
             font-size: 11px;
-            height: 24px;
+            height: 26px;
             background: white;
             box-sizing: border-box;
+            /* Verhindert, dass Padding das Feld vergrößert */
         }
         
         body.dark-mode .header-input {
@@ -480,10 +483,10 @@
                 <table style="table-layout: fixed;">
                     <thead>
                         <tr>
-                            <th style="width:200px">Gegenstand</th>
-                            <th style="width:50px">Anz.</th>
-                            <th style="width:125px">Verliehen</th>
-                            <th>Kommentare / Historie</th>
+                            <th style="width:180px">Gegenstand</th>
+                            <th style="width:45px">Anz.</th>
+                            <th style="width:110px; text-align: center;">Verliehen am</th>
+                            <th>Kommentare</th>
                             <th style="width:40px">🗑️</th>
                         </tr>
                     </thead>
