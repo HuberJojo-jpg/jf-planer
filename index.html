@@ -1,894 +1,336 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JF Ehingen Verwaltung</title>
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/491/491410.png">
+    <title>JF Ehingen Verwaltung Cloud</title>
+    <link rel="apple-touch-icon" href="https://www.fw-ehingen.de/wp-content/themes/theke-fire/img/fw-logo.svg">
+    <link rel="icon" type="image/png" href="https://www.fw-ehingen.de/wp-content/themes/theke-fire/img/fw-logo.svg">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <style>
-         :root {
-            --fire-red: #e10000;
-            --dark-bg: #121212;
-            --dark-card: #1e1e1e;
-            --dark-text: #d0d0d0;
-            --light-bg: #f4f4f4;
-            --light-card: #ffffff;
-            --light-text: #333;
-        }
+        :root { --fire-red: #e10000; --light-bg: #f4f4f4; --dark-bg: #121212; --dark-card: #1e1e1e; }
+        body { font-family: -apple-system, system-ui, sans-serif; margin: 0; background: var(--light-bg); transition: 0.3s; color: #333; }
         
-        body {
-            font-family: -apple-system, system-ui, sans-serif;
-            margin: 0;
-            background: var(--light-bg);
-            color: var(--light-text);
-            transition: 0.3s;
-            overflow-x: hidden;
-        }
+        #authContainer { position: fixed; top:0; left:0; width:100%; height:100%; background: #e10000; z-index: 2000; display: flex; align-items: center; justify-content: center; }
+        .auth-box { background: white; padding: 30px; border-radius: 15px; width: 300px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .auth-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        #mainApp { display: none; }
+
+        /* --- BASIS DARK MODE --- */
+        body.dark-mode { background: var(--dark-bg) !important; color: #e0e0e0 !important; }
+        body.dark-mode .header-nav, 
+        body.dark-mode .controls, 
+        body.dark-mode .table-container, 
+        body.dark-mode .config-box, 
+        body.dark-mode .modal-content,
+        body.dark-mode table { background: var(--dark-card) !important; border-color: #444 !important; color: white !important; }
         
-        body.dark-mode {
-            background: var(--dark-bg);
-            color: var(--dark-text);
-        }
+        body.dark-mode th, body.dark-mode td { background: var(--dark-card) !important; border-color: #444 !important; }
+        body.dark-mode input, body.dark-mode textarea { background: #2a2a2a !important; color: white !important; border: 1px solid #555 !important; }
+        body.dark-mode .tab { background: #333; border-color: #444; color: #aaa; }
+        body.dark-mode .tab.active { background: var(--fire-red) !important; color: white !important; border-top-color: var(--fire-red); }
+        body.dark-mode .sticky-col { background-color: var(--dark-card) !important; border-right: 3px solid #555 !important; }
+
+        /* --- STATUS FARBEN --- */
+        td.status-A, body.dark-mode td.status-A { background-color: #c3e6cb !important; color: #155724 !important; }
+        td.status-E, body.dark-mode td.status-E { background-color: #ffeeba !important; color: #856404 !important; }
+        td.status-U, body.dark-mode td.status-U { background-color: #f5c6cb !important; color: #721c24 !important; }
         
-        .sidebar {
-            height: 100%;
-            width: 0;
-            position: fixed;
-            z-index: 300;
-            top: 0;
-            left: 0;
-            background: #222;
-            overflow-x: hidden;
-            transition: 0.3s;
-            padding-top: 60px;
-        }
+        body.dark-mode td.status-A, body.dark-mode td.status-A select { background-color: #1b4332 !important; color: #d8f3dc !important; }
+        body.dark-mode td.status-E, body.dark-mode td.status-E select { background-color: #5d4a1b !important; color: #ffea00 !important; }
+        body.dark-mode td.status-U, body.dark-mode td.status-U select { background-color: #641220 !important; color: #ffccd5 !important; }
+
+        /* --- LAYOUT --- */
+        .header-nav { background: white; padding: 10px 15px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .logo-img { height: 40px; width: auto; }
+        .sidebar { height: 100%; width: 0; position: fixed; z-index: 3000; top: 0; left: 0; background: #222; overflow-x: hidden; transition: 0.3s; padding-top: 60px; }
+        .sidebar a { padding: 15px 25px; color: white; display: block; text-decoration: none; font-size: 18px; cursor: pointer; }
+        .view-section { display: none; padding: 15px; }
+        .view-section.active { display: block; }
+        .controls { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+        .tab-container { display: flex; gap: 4px; }
+        .tab { padding: 12px 20px; background: #ddd; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; border: 1px solid #ccc; border-bottom: none; color: #666; }
+        .tab.active { background: white; color: var(--fire-red); border-top: 3px solid var(--fire-red); }
+
+        .table-container { background: white; padding: 8px; border-radius: 0 10px 10px 10px; overflow-x: auto; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); }
+        table { border-collapse: separate; border-spacing: 0; min-width: 100%; table-layout: fixed; }
         
-        .sidebar a,
-        .sidebar label {
-            padding: 15px 25px;
-            color: white;
-            display: block;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 18px;
-        }
+        th, td { border: 1px solid #ddd; padding: 5px; text-align: center; height: 50px; vertical-align: middle; position: relative; }
+        th { height: 85px; } 
+
+        /* Themen-Eingabe mittig */
+        th input[type="text"] { text-align: center !important; }
         
-        .sidebar .closebtn {
-            position: absolute;
-            top: 10px;
-            right: 25px;
-            font-size: 36px;
-        }
+        .sticky-col { position: sticky; left: 0; z-index: 100; width: 180px; min-width: 180px; background-color: white !important; border-right: 3px solid #bbb !important; }
+        .sticky-col input { width: 90%; border: none; background: transparent; font-weight: bold; color: inherit; text-align: center; outline: none; cursor: default; font-size: 18px; }
+
+        .status-cell { padding: 0 !important; width: 65px; }
+        .att-select { width: 100%; height: 100%; min-height: 48px; border: none; background: transparent; font-weight: bold; cursor: pointer; text-align: center; text-align-last: center; color: inherit; appearance: none; display: block; font-size: 16px; }
         
-        .header-nav {
-            background: var(--light-card);
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+        /* Inventar Textarea Anpassung */
+        #inventoryBody td { padding: 0; }
+        #inventoryBody textarea { width: 100%; height: 100%; min-height: 50px; border: none; background: transparent; box-sizing: border-box; display: block; padding: 8px; font-family: inherit; font-size: inherit; color: inherit; resize: none; }
+
+        .modal { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(3px); }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border-radius: 15px; width: 320px; text-align: center; }
         
-        body.dark-mode .header-nav {
-            background: var(--dark-card);
-            border-bottom: 1px solid #333;
-        }
-        
-        .menu-icon {
-            font-size: 28px;
-            cursor: pointer;
-            color: var(--fire-red);
-        }
-        
-        .view-section {
-            display: none;
-            padding: 15px;
-        }
-        
-        .view-section.active {
-            display: block;
-        }
-        
-        .controls {
-            background: var(--light-card);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        body.dark-mode .controls {
-            background: var(--dark-card);
-            border: 1px solid #333;
-        }
-        
-        .controls h2 {
-            width: 100%;
-            margin: 0 0 10px 0;
-            font-size: 1.1rem;
-            color: var(--fire-red);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-        }
-        
-        input,
-        select,
-        textarea {
-            padding: 6px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-        
-        body.dark-mode input,
-        body.dark-mode select,
-        body.dark-mode textarea {
-            background: #2a2a2a;
-            color: white;
-            border-color: #444;
-        }
-        
-        button {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        
-        .btn-green {
-            background: #28a745;
-        }
-        
-        .btn-blue {
-            background: #007bff;
-        }
-        
-        .btn-gray {
-            background: #6c757d;
-        }
-        
-        .btn-orange {
-            background: #fd7e14;
-        }
-        
-        .btn-red {
-            background: #dc3545;
-        }
-        
-        .btn-purple {
-            background: #6f42c1;
-        }
-        
-        .btn-cyan {
-            background: #17a2b8;
-        }
-        
-        .tab-container {
-            display: flex;
-            gap: 4px;
-            margin-bottom: -1px;
-        }
-        
-        .tab {
-            padding: 10px 18px;
-            background: #ddd;
-            border-radius: 8px 8px 0 0;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-bottom: none;
-        }
-        
-        body.dark-mode .tab {
-            background: #333;
-            color: #888;
-            border-color: #444;
-        }
-        
-        .tab.active {
-            background: var(--light-card);
-            color: var(--fire-red);
-            border-top: 3px solid var(--fire-red);
-        }
-        
-        body.dark-mode .tab.active {
-            background: var(--dark-card);
-            color: var(--fire-red);
-            border-bottom: 1px solid var(--dark-card);
-        }
-        
-        .table-container {
-            background: var(--light-card);
-            padding: 8px;
-            border-radius: 0 10px 10px 10px;
-            overflow-x: auto;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        body.dark-mode .table-container {
-            background: var(--dark-card);
-            border: 1px solid #333;
-        }
-        
-        table {
-            border-collapse: collapse;
-            min-width: 100%;
-        }
-        
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 4px 6px;
-            text-align: center;
-        }
-        
-        body.dark-mode th,
-        body.dark-mode td {
-            border-color: #333;
-        }
-        
-        .sticky-col {
-            position: sticky;
-            left: 0;
-            z-index: 40;
-            background: white !important;
-            width: 170px;
-            min-width: 170px;
-            border-right: 2px solid #bbb !important;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            text-align: left;
-            font-weight: bold;
-        }
-        
-        body.dark-mode .sticky-col {
-            background: #1e1e1e !important;
-            color: white;
-            border-right-color: #444 !important;
-        }
-        
-        .header-input {
-            text-align: center;
-            width: 100%;
-            max-width: 115px;
-            /* Etwas schmaler für iPad Chrome */
-            border: 1px solid #bbb;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 11px;
-            height: 24px;
-            background: white;
-            box-sizing: border-box;
-            padding: 0;
-            margin: 0 auto;
-            display: block;
-            min-width: 0;
-            /* Wichtig für Chrome auf iOS */
-        }
-        
-        body.dark-mode .header-input {
-            background: #2a2a2a;
-            color: white;
-            border-color: #444;
-        }
-        
-        .special-header {
-            background: #d0e1f9;
-            color: #333;
-            font-weight: 600;
-            font-size: 11px;
-            width: 100px;
-        }
-        
-        body.dark-mode .special-header {
-            background: #2c3e50;
-            color: #ecf0f1;
-        }
-        
-        .search-container {
-            position: relative;
-            margin: 10px 0;
-        }
-        
-        .search-box {
-            width: 100%;
-            border: 2px solid var(--fire-red);
-            border-radius: 8px;
-            padding: 10px 12px 10px 40px;
-            font-size: 14px;
-            outline: none;
-            box-sizing: border-box;
-            background: var(--light-card);
-        }
-        
-        body.dark-mode .search-box {
-            background: #1a1a1a;
-            color: white;
-        }
-        
-        .search-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-            color: #888;
-            font-size: 16px;
-        }
-        
-        .status-A {
-            background-color: #d4edda !important;
-        }
-        
-        .status-E {
-            background-color: #fff3cd !important;
-        }
-        
-        .status-U {
-            background-color: #f8d7da !important;
-        }
-        
-        body.dark-mode .status-A {
-            background-color: #1b3320 !important;
-        }
-        
-        body.dark-mode .status-E {
-            background-color: #3d341a !important;
-        }
-        
-        body.dark-mode .status-U {
-            background-color: #3d1a1a !important;
-        }
-        
-        .inv-date-input {
-            width: 100%;
-            max-width: 110px;
-            font-size: 11px;
-            height: 26px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-align: center;
-            display: block;
-            margin: 0 auto;
-            padding: 0;
-            /* Speziell für Chrome/Safari auf iPad */
-            line-height: 26px;
-            background-color: #fff;
-        }
-        
-        .inv-item-input {
-            width: 100%;
-            border: none;
-            background: transparent;
-            font-size: 13px;
-            color: inherit;
-            height: 24px;
-        }
-        
-        .inventory-comment {
-            width: 100%;
-            min-height: 40px;
-            border: 1px solid #eee;
-            background: #fffdf5;
-            padding: 4px 6px;
-            border-radius: 4px;
-            resize: vertical;
-            font-size: 12px;
-            box-sizing: border-box;
-            display: block;
-            line-height: 1.3;
-        }
-        
-        body.dark-mode .inventory-comment {
-            background: #1a1a1a;
-            color: #ccc;
-            border-color: #333;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 400;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-        }
-        
-        .modal-content {
-            background: white;
-            margin: 15% auto;
-            padding: 20px;
-            border-radius: 12px;
-            width: 280px;
-            text-align: center;
-        }
-        
-        body.dark-mode .modal-content {
-            background: var(--dark-card);
-            color: white;
-        }
+        /* Termin-Datum mittig und kleiner */
+        #newDateInput { width: 80%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; display: block; margin: 0 auto 15px auto; font-size: 16px; text-align: center; }
+
+        .btn-green { background: #28a745; } .btn-red { background: #dc3545; } .btn-blue { background: #007bff; } .btn-gray { background: #6c757d; } .btn-orange { background: #fd7e14; } .btn-cyan { background: #17a2b8; }
+        button { padding: 10px 14px; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; margin: 2px; }
     </style>
 </head>
-
 <body>
 
-    <div id="mySidebar" class="sidebar">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <a onclick="showSection('dienstplan')">📅 Dienstplan</a>
-        <a onclick="showSection('inventar')">📦 Inventar</a>
-        <div style="padding: 15px 25px;">
-            <label style="color: white; font-size: 16px; cursor: pointer;">
-                <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()"> Dark Mode
-            </label>
+    <div id="authContainer">
+        <div class="auth-box">
+            <img src="https://www.fw-ehingen.de/wp-content/themes/theke-fire/img/fw-logo.svg" style="height:70px; margin-bottom:15px;">
+            <h2 style="margin:0 0 20px 0">JF Ehingen Cloud</h2>
+            <input type="email" id="email" placeholder="E-Mail">
+            <input type="password" id="password" placeholder="Passwort">
+            <button class="btn-red" style="width:100%" onclick="window.handleLogin()">Anmelden</button>
+            <p id="loginError" style="color:red; display:none;"></p>
         </div>
     </div>
 
-    <div class="header-nav">
-        <span class="menu-icon" onclick="openNav()">&#9776;</span>
-        <img src="https://www.fw-ehingen.de/wp-content/themes/theke-fire/img/fw-logo.svg" alt="Logo" style="height:30px">
-        <strong style="color: var(--fire-red); margin-left:10px;">Verwaltung JF Ehingen</strong>
-    </div>
+    <div id="mainApp">
+        <div class="header-nav">
+            <span onclick="window.openNav()" style="font-size:25px; cursor:pointer; color:red">☰</span>
+            <img src="https://www.fw-ehingen.de/wp-content/themes/theke-fire/img/fw-logo.svg" class="logo-img">
+            <strong style="margin-left:10px; color:red">JF Ehingen Cloud</strong>
+        </div>
 
-    <div class="main-content">
-        <section id="dienstplan" class="view-section active">
-            <div class="controls">
-                <h2>JF Dienstplan</h2>
-                <input type="text" id="nameInput" placeholder="Name..." onkeypress="if(event.key === 'Enter') addMember()">
-                <button class="btn-green" onclick="addMember()">➕</button>
-                <button class="btn-orange" onclick="addSpecialColumn()">☑️ Liste</button>
-                <button class="btn-cyan" onclick="showDateModal()">📅 Termin+</button>
-                <button class="btn-blue" onclick="exportDienstplanCSV()">💾 Export</button>
-                <button class="btn-gray" onclick="toggleConfig()">⚙️ Setup</button>
+        <div id="mySidebar" class="sidebar">
+            <a onclick="window.closeNav()" style="font-size:30px; position:absolute; right:20px; top:10px">×</a>
+            <a onclick="window.showSection('dienstplan')">📅 Dienstplan</a>
+            <a onclick="window.showSection('inventar')">📦 Inventar</a>
+            <a onclick="window.toggleDarkMode()">🌓 Dark Mode</a>
+            <a onclick="window.handleLogout()" style="color: #ff4d4d; margin-top:30px">🚪 Abmelden</a>
+        </div>
 
-                <div id="configSection" style="display:none; width: 100%; background: rgba(128,128,128,0.1); padding: 12px; border-radius: 8px; margin-top: 10px;">
-                    <textarea id="ferienInput" style="width:100%; height:60px; font-size:11px; margin-bottom:10px;">2025-12-22 bis 2026-01-05
-2026-03-30 bis 2026-04-11
-2026-05-26 bis 2026-06-05
-2026-07-30 bis 2026-09-12
-2026-10-26 bis 2026-10-31
-2026-12-23 bis 2026-12-31</textarea>
-                    <div style="display:flex; gap:8px;">
-                        <button class="btn-red" style="flex:2" onclick="rebuildCalendar()">Kalender neu berechnen</button>
-                        <button class="btn-purple" style="flex:1" onclick="createBackup()">Backup</button>
-                        <button class="btn-blue" style="flex:1" onclick="importBackup()">Import</button>
+        <div class="main-content">
+            <section id="dienstplan" class="view-section active">
+                <div class="controls">
+                    <input type="text" id="nameInput" placeholder="Name..." style="padding:10px" onkeydown="if(event.key === 'Enter') window.addMember()">
+                    <button class="btn-green" onclick="window.addMember()">➕</button>
+                    <button class="btn-orange" onclick="window.addSpecialColumn()">☑️ Liste</button>
+                    <button class="btn-cyan" onclick="window.openDateModal()">📅 Termin+</button>
+                    <button class="btn-blue" onclick="window.exportDienstplanCSV()">Export</button>
+                    <button class="btn-gray" onclick="window.toggleConfig()">⚙️ Setup</button>
+                    <div id="configSection" class="config-box" style="display:none; padding:15px; width:100%">
+                        <textarea id="ferienInput">2026-12-23 bis 2026-12-31</textarea>
+                        <button class="btn-red" onclick="window.rebuildCalendar()">🔄 Kalender generieren</button>
                     </div>
                 </div>
-            </div>
 
-            <div class="tab-container">
-                <div id="tab-Kleine" class="tab active" onclick="switchTab('Kleine')">Kleine</div>
-                <div id="tab-Große" class="tab" onclick="switchTab('Große')">Große</div>
-                <div id="tab-Betreuer" class="tab" onclick="switchTab('Betreuer')">Betreuer</div>
-            </div>
+                <div class="tab-container">
+                    <div id="tab-Kleine" class="tab active" onclick="window.switchTab('Kleine')">Kleine</div>
+                    <div id="tab-Große" class="tab" onclick="window.switchTab('Große')">Große</div>
+                    <div id="tab-Betreuer" class="tab" onclick="window.switchTab('Betreuer')">Betreuer</div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead id="headerRow"></thead>
+                        <tbody id="memberBody"></tbody>
+                        <tfoot id="footerRow"></tfoot>
+                    </table>
+                </div>
+            </section>
 
-            <div class="table-container">
-                <table id="planTable">
-                    <thead>
-                        <tr id="headerRow"></tr>
-                    </thead>
-                    <tbody id="memberBody"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="inventar" class="view-section">
-            <thead>
-                <tr>
-                    <th style="width:180px">Gegenstand</th>
-                    <th style="width:45px">Anz.</th>
-                    <th style="width:115px; text-align: center;">Verliehen am</th>
-                    <th>Kommentare</th>
-                    <th style="width:40px">🗑️</th>
-                </tr>
-            </thead>
-
-            <div class="search-container">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="invSearchInput" class="search-box" placeholder="Suche..." onkeyup="renderInventory()">
-            </div>
-
-            <div class="table-container">
-                <table style="table-layout: fixed;">
-                    <thead>
-                        <tr>
-                            <th style="width:180px">Gegenstand</th>
-                            <th style="width:45px">Anz.</th>
-                            <th style="width:110px; text-align: center;">Verliehen am</th>
-                            <th>Kommentare</th>
-                            <th style="width:40px">🗑️</th>
-                        </tr>
-                    </thead>
-                    <tbody id="inventoryBody"></tbody>
-                </table>
-            </div>
-        </section>
+            <section id="inventar" class="view-section">
+                <div class="controls">
+                    <input type="text" id="itemInput" placeholder="Neuer Gegenstand..." style="flex-grow:1; padding:10px" onkeydown="if(event.key === 'Enter') window.addInventoryItem()">
+                    <button class="btn-green" onclick="window.addInventoryItem()">➕</button>
+                </div>
+                <div class="table-container">
+                    <table><thead><tr><th>Gegenstand</th><th style="width:60px">Anz.</th><th>Verliehen</th><th>Kommentare</th><th style="width:50px">🗑️</th></tr></thead><tbody id="inventoryBody"></tbody></table>
+                </div>
+            </section>
+        </div>
     </div>
 
     <div id="dateModal" class="modal">
         <div class="modal-content">
-            <h3>Termin hinzufügen</h3>
-            <input type="date" id="newDateInput" style="width:100%; margin-bottom:15px">
-            <button class="btn-green" style="width:100%" onclick="addManualDate()">Hinzufügen</button>
-            <button class="btn-gray" style="width:100%; margin-top:5px" onclick="closeDateModal()">Abbrechen</button>
+            <h3>Neuer Termin</h3>
+            <input type="date" id="newDateInput">
+            <button class="btn-green" onclick="window.addManualDate()">Hinzufügen</button>
+            <button class="btn-gray" onclick="window.closeDateModal()">Abbrechen</button>
         </div>
     </div>
 
-    <script>
-        const STORAGE_KEY = 'jf_ehingen_v39_csv_fix';
-        let state = {
-            dates: [],
-            specials: [],
-            members: [],
-            currentTab: 'Kleine',
-            ferienRaw: "",
-            inventory: [],
-            darkMode: false
-        };
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, onSnapshot, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        function init() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                state = JSON.parse(saved);
-                if (state.darkMode) {
-                    document.body.classList.add('dark-mode');
-                    document.getElementById('darkModeToggle').checked = true;
-                }
-                document.getElementById('ferienInput').value = state.ferienRaw || document.getElementById('ferienInput').value;
-                render();
-                renderInventory();
-            } else {
-                rebuildCalendar(false);
-            }
-        }
+    const firebaseConfig = {
+        apiKey: "AIzaSyAp8O_pbGENpRl4QL5qawF5QLTXJKSz5k8",
+        authDomain: "jf-verwaltung-a8aa0.firebaseapp.com",
+        projectId: "jf-verwaltung-a8aa0",
+        storageBucket: "jf-verwaltung-a8aa0.firebasestorage.app",
+        messagingSenderId: "910658603721",
+        appId: "1:910658603721:web:6af4b03bb12f70c5701b18"
+    };
 
-        function save() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        }
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const docRef = doc(db, "verwaltung", "ehingen_master");
 
-        function toggleDarkMode() {
-            state.darkMode = document.getElementById('darkModeToggle').checked;
-            document.body.classList.toggle('dark-mode', state.darkMode);
-            save();
-        }
+    let state = { dates: [], members: [], currentTab: 'Kleine', inventory: [], specials: [], darkMode: false };
+    let saveTimeout = null;
 
-        function openNav() {
-            document.getElementById("mySidebar").style.width = "250px";
-        }
+    const deToIso = (de) => de.split('.').reverse().join('-');
 
-        function closeNav() {
-            document.getElementById("mySidebar").style.width = "0";
-        }
+    window.handleLogin = () => {
+        signInWithEmailAndPassword(auth, email.value, password.value).catch(e => loginError.style.display="block");
+    };
+    window.handleLogout = () => signOut(auth);
 
-        function showSection(id) {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            closeNav();
-            if (id === 'inventar') renderInventory();
-            else render();
-        }
-
-        function switchTab(t) {
-            state.currentTab = t;
-            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + t).classList.add('active');
-            render();
-        }
-
-        function deToIso(de) {
-            const p = de.split('.');
-            return p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : "";
-        }
-
-        function isoToDe(iso) {
-            const p = iso.split('-');
-            return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : iso;
-        }
-
-        function sortDates() {
-            state.dates.sort((a, b) => new Date(deToIso(a.d)) - new Date(deToIso(b.d)));
-        }
-
-        function rebuildCalendar(ask = true) {
-            if (ask && !confirm("Kalender neu berechnen? Anwesenheiten gehen verloren.")) return;
-            state.ferienRaw = document.getElementById('ferienInput').value;
-            const ranges = state.ferienRaw.split('\n').filter(l => l.includes(' bis ')).map(l => {
-                const p = l.split(' bis ');
-                return {
-                    start: p[0].trim(),
-                    end: p[1].trim()
-                };
-            });
-            state.dates = [];
-            let d = new Date(2026, 0, 1);
-            while (d.getDay() !== 2) d.setDate(d.getDate() + 1);
-            while (d.getFullYear() === 2026) {
-                let y = d.getFullYear(),
-                    m = String(d.getMonth() + 1).padStart(2, '0'),
-                    day = String(d.getDate()).padStart(2, '0');
-                const iso = `${y}-${m}-${day}`;
-                const isHoliday = ranges.some(r => iso >= r.start && iso <= r.end);
-                if (!isHoliday) state.dates.push({
-                    d: isoToDe(iso),
-                    t: ""
-                });
-                d.setDate(d.getDate() + 7);
-            }
-            state.members.forEach(m => m.attendance = {});
-            render();
-            if (ask) toggleConfig();
-        }
-
-        function render() {
-            const header = document.getElementById('headerRow');
-            const body = document.getElementById('memberBody');
-            let headHTML = `<th class="sticky-col">Name</th><th>A</th><th>E</th><th>U</th><th>%</th>`;
-            state.specials.forEach((s, i) => headHTML += `<th class="special-header">${s} <span onclick="removeSpecial(${i})" style="color:red; cursor:pointer">✕</span></th>`);
-            state.dates.forEach((d, i) => {
-                headHTML += `<th style="width:130px">
-                    <span onclick="removeDate(${i})" style="color:red; cursor:pointer; float:right; font-size:14px;">✕</span>
-                    <input type="date" value="${deToIso(d.d)}" class="header-input" onchange="editDate(${i}, 'd', this.value)">
-                    <br><input type="text" value="${d.t}" placeholder="Thema..." class="header-input" style="font-weight:normal; margin-top:3px" onchange="editDate(${i}, 't', this.value)">
-                </th>`;
-            });
-            header.innerHTML = headHTML + `<th style="width:50px">🗑️</th>`;
-
-            body.innerHTML = '';
-            state.members.filter(m => m.category === state.currentTab).forEach((m) => {
-                const gIdx = state.members.indexOf(m);
-                const attVals = Object.values(m.attendance);
-                const a = attVals.filter(v => v === 'A').length,
-                    e = attVals.filter(v => v === 'E').length,
-                    u = attVals.filter(v => v === 'U').length;
-                const total = attVals.filter(v => v !== '-').length;
-                const quote = total > 0 ? Math.round((a / total) * 100) : 0;
-
-                let row = `<td class="sticky-col"><input type="text" class="inv-item-input" style="font-weight:bold" value="${m.name}" onchange="state.members[${gIdx}].name=this.value;save()"></td>
-                           <td>${a}</td><td>${e}</td><td>${u}</td><td>${quote}%</td>`;
-
-                state.specials.forEach((s, sIdx) => {
-                    const chk = (m.specialStates && m.specialStates[sIdx]) ? 'checked' : '';
-                    row += `<td><input type="checkbox" ${chk} onchange="state.members[${gIdx}].specialStates[${sIdx}]=this.checked;save()"></td>`;
-                });
-
-                state.dates.forEach((d) => {
-                    const val = m.attendance[d.d] || '-';
-                    row += `<td class="status-${val}"><select onchange="updateAtt(${gIdx}, '${d.d}', this.value)" style="border:none; background:transparent; font-weight:bold; color:inherit; cursor:pointer">
-                        <option value="-" ${val==='-'?'selected':''}>-</option><option value="A" ${val==='A'?'selected':''}>A</option><option value="E" ${val==='E'?'selected':''}>E</option><option value="U" ${val==='U'?'selected':''}>U</option>
-                    </select></td>`;
-                });
-                row += `<td><button onclick="deleteMember(${gIdx})" style="background:none; border:none; cursor:pointer; font-size:18px">🗑️</button></td>`;
-                body.innerHTML += `<tr>${row}</tr>`;
-            });
-            save();
-        }
-
-        function renderInventory() {
-            const body = document.getElementById('inventoryBody');
-            const q = document.getElementById('invSearchInput').value.toLowerCase();
-            body.innerHTML = '';
-            state.inventory.forEach((item, idx) => {
-                if (item.name.toLowerCase().includes(q) || item.log.toLowerCase().includes(q)) {
-                    body.innerHTML += `<tr>
-                        <td><input type="text" class="inv-item-input" value="${item.name}" onchange="state.inventory[${idx}].name=this.value;save()"></td>
-                        <td><input type="text" style="width:100%; border:none; background:transparent; color:inherit; text-align:center" value="${item.amount}" onchange="state.inventory[${idx}].amount=this.value;save()"></td>
-                        <td><input type="date" style="width:100%; border:none; background:transparent; color:inherit" value="${item.loanDate}" onchange="state.inventory[${idx}].loanDate=this.value;save()"></td>
-                        <td><textarea class="inventory-comment" onchange="state.inventory[${idx}].log=this.value;save()">${item.log}</textarea></td>
-                        <td><button onclick="state.inventory.splice(${idx},1);renderInventory();save()" style="background:none; border:none; cursor:pointer; font-size:18px">🗑️</button></td>
-                    </tr>`;
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            authContainer.style.display = 'none';
+            mainApp.style.display = 'block';
+            onSnapshot(docRef, (doc) => {
+                if (doc.exists()) {
+                    state = doc.data();
+                    if(state.darkMode) document.body.classList.add('dark-mode');
+                    else document.body.classList.remove('dark-mode');
+                    window.render(); window.renderInventory();
                 }
             });
+        } else {
+            authContainer.style.display = 'flex';
+            mainApp.style.display = 'none';
+        }
+    });
+
+    window.save = async () => await setDoc(docRef, state);
+
+    window.updateTopic = (idx, val) => {
+        state.dates[idx].t = val;
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(async () => {
+            await updateDoc(docRef, { dates: state.dates });
+        }, 2000);
+    };
+
+    // Kalender für beliebiges Jahr generieren
+    window.rebuildCalendar = () => {
+        const yearInput = prompt("Für welches Jahr soll der Kalender generiert werden?", "2026");
+        if(!yearInput) return;
+        const targetYear = parseInt(yearInput);
+
+        if(!confirm(`Kalender für ${targetYear} generieren? ACHTUNG: Dabei werden ALLE bisherigen Anwesenheiten gelöscht!`)) return;
+
+        state.members.forEach(m => { m.attendance = {}; });
+        state.dates = [];
+
+        let d = new Date(`${targetYear}-01-01T12:00:00`);
+        while (d.getDay() !== 2) { 
+            d.setDate(d.getDate() + 1);
         }
 
-        function updateAtt(mI, dateStr, v) {
-            state.members[mI].attendance[dateStr] = v;
-            render();
-        }
-
-        function addInventoryItem() {
-            const val = document.getElementById('itemInput').value;
-            if (!val) return;
-            state.inventory.push({
-                name: val,
-                amount: "1",
-                loanDate: "",
-                log: ""
+        const ferien = document.getElementById('ferienInput').value;
+        while(d.getFullYear() === targetYear) {
+            const dStr = d.toISOString().split('T')[0];
+            const isFerien = ferien.split('\n').some(z => {
+                const p = z.split(' bis ');
+                return p.length === 2 && dStr >= p[0].trim() && dStr <= p[1].trim();
             });
-            document.getElementById('itemInput').value = '';
-            renderInventory();
-            save();
-        }
-
-        function addMember() {
-            const n = document.getElementById('nameInput').value;
-            if (!n) return;
-            state.members.push({
-                name: n,
-                category: state.currentTab,
-                attendance: {},
-                specialStates: []
-            });
-            document.getElementById('nameInput').value = '';
-            render();
-        }
-
-        function removeDate(i) {
-            if (confirm("Termin löschen?")) {
-                const d = state.dates[i].d;
-                state.members.forEach(m => delete m.attendance[d]);
-                state.dates.splice(i, 1);
-                render();
+            if(!isFerien) {
+                const formatted = dStr.split('-').reverse().join('.');
+                state.dates.push({ d: formatted, t: "" });
             }
+            d.setDate(d.getDate() + 7);
         }
+        window.save();
+    };
 
-        function deleteMember(i) {
-            if (confirm("Löschen?")) {
-                state.members.splice(i, 1);
-                render();
-            }
-        }
+    window.render = () => {
+        const h = document.getElementById('headerRow'); const b = document.getElementById('memberBody'); const f = document.getElementById('footerRow');
+        if(!h || !b || !f) return;
+        state.dates.sort((a,b) => deToIso(a.d).localeCompare(deToIso(b.d)));
 
-        function editDate(i, f, v) {
-            if (f === 'd') {
-                const old = state.dates[i].d,
-                    nD = isoToDe(v);
-                state.members.forEach(m => {
-                    if (m.attendance[old]) {
-                        m.attendance[nD] = m.attendance[old];
-                        delete m.attendance[old];
-                    }
-                });
-                state.dates[i].d = nD;
-                sortDates();
-            } else {
-                state.dates[i].t = v;
-            }
-            save();
-            render();
-        }
+        let hHtml = `<tr><th class="sticky-col">Name</th><th style="width:40px">A</th><th style="width:40px">E</th><th style="width:40px">U</th><th style="width:45px">%</th>`;
+        state.specials?.forEach((s, i) => hHtml += `<th style="width:100px; font-size:12px;">${s}<br><span onclick="window.removeSpecial(${i})" style="color:red; cursor:pointer;">✕</span></th>`);
+        state.dates.forEach((d, i) => {
+            hHtml += `<th style="width:130px; font-size:13px;">${d.d}<br><input type="text" id="topic-${i}" value="${d.t || ''}" oninput="window.updateTopic(${i}, this.value)" onchange="window.save()"><br><span onclick="window.removeDate(${i})" style="color:red; cursor:pointer; font-size:11px">✕</span></th>`;
+        });
+        h.innerHTML = hHtml + '<th style="width:50px">🗑️</th></tr>';
 
-        function showDateModal() {
-            document.getElementById('dateModal').style.display = 'block';
-        }
+        const filtered = state.members.filter(m => m.category === state.currentTab).sort((a,b) => a.name.localeCompare(b.name, 'de'));
+        b.innerHTML = filtered.map(m => {
+            const mIdx = state.members.findIndex(x => x.id === m.id);
+            const att = Object.values(m.attendance || {});
+            const aCount = att.filter(v=>v==='A').length;
+            let row = `<td class="sticky-col"><input type="text" value="${m.name}" readonly></td><td style="font-weight:bold">${aCount}</td><td>${att.filter(v=>v==='E').length}</td><td>${att.filter(v=>v==='U').length}</td><td>${att.length ? Math.round((aCount/att.length)*100) : 0}%</td>`;
+            state.specials?.forEach((_, sI) => row += `<td class="special-cell"><input type="checkbox" ${m.specialStates?.[sI] ? 'checked' : ''} onchange="window.toggleSpecialDirect(${mIdx}, ${sI})"></td>`);
+            row += state.dates.map(d => `<td class="status-cell status-${m.attendance?.[d.d] || '-'}"><select class="att-select" onchange="window.updateAtt('${mIdx}','${d.d}',this.value)"><option value="-" ${(m.attendance?.[d.d]||'-')==='-'?'selected':''}>-</option><option value="A" ${m.attendance?.[d.d]==='A'?'selected':''}>A</option><option value="E" ${m.attendance?.[d.d]==='E'?'selected':''}>E</option><option value="U" ${m.attendance?.[d.d]==='U'?'selected':''}>U</option></select></td>`).join('');
+            return `<tr>${row}<td><button class="btn-red" onclick="window.deleteMember(${mIdx})">🗑️</button></td></tr>`;
+        }).join('');
 
-        function closeDateModal() {
-            document.getElementById('dateModal').style.display = 'none';
-        }
+        let fHtml = `<tr><td class="sticky-col">Gesamt</td><td></td><td></td><td></td><td></td>`;
+        state.specials?.forEach((_, sI) => fHtml += `<td style="font-size:12px; font-weight:bold; color:#fd7e14;">${filtered.reduce((acc, m) => (m.specialStates?.[sI] ? acc + 1 : acc), 0)} / ${filtered.length}</td>`);
+        state.dates.forEach(d => fHtml += `<td style="font-size:18px; font-weight:bold">${filtered.reduce((acc, m) => (m.attendance?.[d.d] === 'A' ? acc + 1 : acc), 0)}</td>`);
+        f.innerHTML = fHtml + "<td></td></tr>";
+    };
 
-        function addManualDate() {
-            const v = document.getElementById('newDateInput').value;
-            if (v) {
-                state.dates.push({
-                    d: isoToDe(v),
-                    t: ""
-                });
-                sortDates();
-                closeDateModal();
-                render();
-            }
-        }
+    window.updateAtt = (mIdx, date, val) => { if(!state.members[mIdx].attendance) state.members[mIdx].attendance = {}; state.members[mIdx].attendance[date] = val; window.save(); };
+    window.addMember = () => { if(!nameInput.value) return; state.members.push({ id: Date.now(), name: nameInput.value, category: state.currentTab, attendance: {}, specialStates: [] }); nameInput.value = ""; window.save(); };
+    window.deleteMember = (idx) => { if (confirm("Löschen?")) { state.members.splice(idx, 1); window.save(); } };
+    
+    window.removeDate = (i) => { 
+        if(confirm("Diesen Termin und alle zugehörigen Anwesenheiten wirklich löschen?")) { 
+            const dateToDelete = state.dates[i].d; 
+            state.dates.splice(i, 1); 
+            state.members.forEach(m => { if(m.attendance) delete m.attendance[dateToDelete]; }); 
+            window.save(); 
+        } 
+    };
 
-        function addSpecialColumn() {
-            const title = prompt("Titel:");
-            if (title) {
-                state.specials.push(title);
-                state.members.forEach(m => {
-                    if (!m.specialStates) m.specialStates = [];
-                    m.specialStates.push(false);
-                });
-                render();
-            }
-        }
+    window.addSpecialColumn = () => { const t = prompt("Name:"); if(t) { state.specials = state.specials || []; state.specials.push(t); window.save(); } };
+    window.removeSpecial = (i) => { if(confirm("Löschen?")) { state.specials.splice(i, 1); state.members.forEach(m => m.specialStates?.splice(i, 1)); window.save(); } };
+    window.toggleSpecialDirect = (mIdx, sI) => { if(!state.members[mIdx].specialStates) state.members[mIdx].specialStates = []; state.members[mIdx].specialStates[sI] = !state.members[mIdx].specialStates[sI]; window.save(); };
+    window.renderInventory = () => { inventoryBody.innerHTML = state.inventory.sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(item => `<tr><td><input type="text" class="inv-input" value="${item.name||''}" onchange="window.updateInvField('${item.id}','name',this.value)"></td><td><input type="text" class="inv-input" value="${item.amount||''}" style="width:50px" onchange="window.updateInvField('${item.id}','amount',this.value)"></td><td><input type="date" class="inv-input" value="${item.loanDate||''}" onchange="window.updateInvField('${item.id}','loanDate',this.value)"></td><td><textarea onchange="window.updateInvField('${item.id}','log',this.value)">${item.log||''}</textarea></td><td><button class="btn-red" onclick="window.deleteInv('${item.id}')">🗑️</button></td></tr>`).join(''); };
+    window.updateInvField = (id, f, v) => { const i = state.inventory.find(x=>x.id==id); if(i){i[f]=v; window.save();} };
+    window.deleteInv = (id) => { if(confirm("Löschen?")){state.inventory=state.inventory.filter(x=>x.id!=id); window.save();} };
+    window.addInventoryItem = () => { if(!itemInput.value) return; state.inventory.push({id:Date.now(), name:itemInput.value, amount:"1"}); itemInput.value=""; window.save(); };
+    
+    window.exportDienstplanCSV = () => {
+        let csv = "\ufeffName;Gruppe;A;E;U;Quote;";
+        state.specials?.forEach(s => csv += s + ";");
+        state.dates.forEach(d => csv += `${d.d};`);
+        csv += "\n";
+        const catOrder = { 'Kleine': 1, 'Große': 2, 'Betreuer': 3 };
+        [...state.members].sort((a,b) => catOrder[a.category] - catOrder[b.category] || a.name.localeCompare(b.name)).forEach(m => {
+            const atts = Object.values(m.attendance || {});
+            csv += `${m.name};${m.category};${atts.filter(v=>v==='A').length};${atts.filter(v=>v==='E').length};${atts.filter(v=>v==='U').length};${atts.length?Math.round((atts.filter(v=>v==='A').length/atts.length)*100):0}%;`;
+            state.specials?.forEach((_, i) => csv += (m.specialStates?.[i] ? "JA" : "NEIN") + ";");
+            state.dates.forEach(d => csv += (m.attendance?.[d.d] || "-") + ";");
+            csv += "\n";
+        });
+        const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); link.download = "Export.csv"; link.click();
+    };
 
-        function removeSpecial(i) {
-            state.specials.splice(i, 1);
-            state.members.forEach(m => m.specialStates.splice(i, 1));
-            render();
-        }
+    window.switchTab = (t) => { 
+        state.currentTab = t; 
+        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + t).classList.add('active');
+        window.render(); 
+    };
 
-        function toggleConfig() {
-            const s = document.getElementById('configSection');
-            s.style.display = s.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function createBackup() {
-            const code = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
-            navigator.clipboard.writeText(code).then(() => alert("Backup-Code kopiert!"));
-        }
-
-        function importBackup() {
-            const code = prompt("Code:");
-            if (code) {
-                try {
-                    state = JSON.parse(decodeURIComponent(escape(atob(code))));
-                    render();
-                    renderInventory();
-                } catch (e) {
-                    alert("Fehler!");
-                }
-            }
-        }
-
-        // REPARIERTER VOLLSTÄNDIGER EXPORT
-        function exportDienstplanCSV() {
-            let csv = "\uFEFF"; // BOM für Excel UTF-8 Erkennung
-            // Header Zeile 1: Spaltenbeschriftungen
-            let header = ["Name", "Kategorie", "A", "E", "U", "Quote %"];
-            state.specials.forEach(s => header.push(s));
-            state.dates.forEach(d => header.push(d.d + (d.t ? " (" + d.t + ")" : "")));
-            csv += header.join(";") + "\r\n";
-
-            // Daten Zeilen
-            state.members.forEach(m => {
-                const vals = Object.values(m.attendance);
-                const a = vals.filter(v => v === 'A').length;
-                const e = vals.filter(v => v === 'E').length;
-                const u = vals.filter(v => v === 'U').length;
-                const total = vals.filter(v => v !== '-').length;
-                const quote = total > 0 ? Math.round((a / total) * 100) : 0;
-
-                let row = [
-                    m.name,
-                    m.category,
-                    a, e, u,
-                    quote + "%"
-                ];
-
-                // Checkbox-Listen Status
-                state.specials.forEach((_, sIdx) => {
-                    row.push((m.specialStates && m.specialStates[sIdx]) ? "JA" : "NEIN");
-                });
-
-                // Einzelne Termine Status
-                state.dates.forEach(d => {
-                    row.push(m.attendance[d.d] || "-");
-                });
-
-                csv += row.join(";") + "\r\n";
-            });
-
-            downloadBlob(csv, "Dienstplan_Ehingen_Vollstaendig.csv");
-        }
-
-        function exportInventoryCSV() {
-            let csv = "\uFEFFGegenstand;Menge;VerliehenAm;Kommentare\r\n";
-            state.inventory.forEach(i => {
-                csv += [
-                    i.name,
-                    i.amount,
-                    i.loanDate,
-                    i.log.replace(/(\r\n|\n|\r|;)/gm, " ") // Entfernt Zeilenumbrüche und Semikolons
-                ].join(";") + "\r\n";
-            });
-            downloadBlob(csv, "Inventar_Ehingen.csv");
-        }
-
-        function downloadBlob(content, filename) {
-            const blob = new Blob([content], {
-                type: 'text/csv;charset=utf-8;'
-            });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            link.click();
-        }
-
-        window.onload = init;
-    </script>
+    window.toggleDarkMode = () => { state.darkMode = !state.darkMode; window.save(); };
+    window.showSection = (id) => { document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); };
+    window.openNav = () => mySidebar.style.width = "250px";
+    window.closeNav = () => mySidebar.style.width = "0";
+    window.toggleConfig = () => configSection.style.display = configSection.style.display==='none'?'block':'none';
+    window.openDateModal = () => dateModal.style.display = 'block';
+    window.closeDateModal = () => dateModal.style.display = 'none';
+    window.addManualDate = () => { if(newDateInput.value) { state.dates.push({ d: newDateInput.value.split('-').reverse().join('.'), t: "" }); window.closeDateModal(); window.save(); } };
+</script>
 </body>
-
 </html>
